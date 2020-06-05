@@ -5,7 +5,7 @@ from stonehenge.users.tables import users
 from stonehenge.type_helper import *
 
 
-__all__ = ['select_user_by_id', ]
+__all__ = ['select_user_by_id', 'select_all_users']
 
 
 async def select_user_by_id(conn: SAConnection, key: int) -> RowProxy:

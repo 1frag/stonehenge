@@ -17,3 +17,7 @@ logs:
 # connect to production server
 connect:
 	heroku run /bin/bash
+
+# run server locally without docker-compose
+runserver:
+	$(PYTHON) -m stonehenge runserver

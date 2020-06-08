@@ -19,5 +19,8 @@ connect:
 	heroku run /bin/bash
 
 # run server locally without docker-compose
-runserver:
-	$(PYTHON) -m stonehenge runserver
+runall:
+	docker-compose up -d
+
+restart_app:
+	docker-compose restart stonehenge_app

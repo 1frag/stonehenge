@@ -33,6 +33,21 @@ async def index(request: web.Request) -> Dict[str, str]:
     return {"text": str(res)}
 
 
+@aiohttp_jinja2.template('login.html')
+async def login(request: web.Request) -> Dict[str, str]:
+    return {}
+
+
+@aiohttp_jinja2.template('registration.html')
+async def registration(request: web.Request) -> Dict[str, str]:
+    return {}
+
+
+@aiohttp_jinja2.template('reg_next.html')
+async def reg_next(request: web.Request) -> Dict[str, str]:
+    return {}
+
+
 async def login_by_google(request: web.Request):
     opts = {
         'redirect_uri': request.app['config']['app']['domain'] + "/callback_by_google",

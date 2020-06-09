@@ -1,7 +1,18 @@
-from typing import List
-import aiopg.sa.result
-import requests_oauthlib
+from typing import List, TYPE_CHECKING
 
-RowsProxy = List[aiopg.sa.result.RowProxy]
-ResultProxy = aiopg.sa.result.ResultProxy
-OAuth2Session = requests_oauthlib.OAuth2Session
+if TYPE_CHECKING:
+    import aiopg.sa.result
+    import requests_oauthlib
+    import aiohttp.web
+    import aiopg.sa.engine
+
+    from aiopg.sa.transaction import RootTransaction
+
+    from stonehenge.app import Application
+
+    RowsProxy = List[aiopg.sa.result.RowProxy]
+    ResultProxy = aiopg.sa.result.ResultProxy
+    OAuth2Session = requests_oauthlib.OAuth2Session
+
+    class Request(aiohttp.web.Request):
+        app: Application

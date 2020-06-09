@@ -10,13 +10,10 @@ import aiopg.sa
 from aiohttp import web
 import jinja2
 import asyncio
-from oauthlib.oauth2 import WebApplicationClient
-from requests_oauthlib import OAuth2Session
-from aiohttp_oauth2.client.contrib import google
+import aioredis
 
-from stonehenge.routes import init_routes
+from stonehenge.routes import init_routes, init_sessions, init_redis
 from stonehenge.utils.common import init_config
-from stonehenge.users.tables import users
 from stonehenge.constants import *
 
 path = Path(__file__).parent
@@ -39,24 +36,32 @@ async def database(app: web.Application) -> AsyncGenerator[None, None]:
     and after stopping it breaks the connection (after yield)
     """
     config = app['config']['postgres']
-
     print(config)
-    engine = await aiopg.sa.create_engine(**config)
-    app['db'] = engine
+    app.db = await aiopg.sa.create_engine(**config)
     db_set.set()
 
     yield
 
-    app['db'].close()
-    await app['db'].wait_closed()
+    app.db.close()
+    await app.db.wait_closed()
+
+
+class Application(web.Application):
+    redis: aioredis.commands.Redis
+    db: aiopg.sa.engine.Engine
+    redis_installed = asyncio.Event()
 
 
 def init_app(config: Optional[List[str]] = None) -> web.Application:
-    app = web.Application()
+    app = Application()
     init_config(app)
     init_jinja2(app)
     init_routes(app)
     app.cleanup_ctx.extend([
         database,
+    ])
+    app.on_startup.extend([
+        init_redis,
+        init_sessions,
     ])
     return app

@@ -61,5 +61,17 @@ services:
         aliases:
           - local.server.stonehenge
 
+  redis:
+    image: "redis:alpine"
+    command: redis-server --requirepass redis
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_REPLICATION_MODE=master
+    networks:
+      stonetwork:
+        aliases:
+          - local.redis.stonehenge
+
 networks:
   stonetwork:

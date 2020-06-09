@@ -4,13 +4,13 @@ WORKDIR /app
 ARG requirements=requirements.txt
 
 ADD . /app
-
+RUN apt update -yq
 RUN pip install --no-cache-dir -e .
 RUN pip install --no-cache-dir -r $requirements
 
 # install for backend
-CMD ["python", "setup.py", "install"]
+RUN python setup.py install
 # install for frontend
-CMD ["cd", "stonehenge/static/js", "&&", "npm", "install", "install"]
+RUN apt install -y npm && npm install stonehenge/static/js
 # run server
-CMD ["cd", "/app", "&&", "python", "-m", "stonehenge", "runserver"]
+CMD ["python", "-m", "stonehenge", "runserver"]

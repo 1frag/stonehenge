@@ -99,50 +99,68 @@
 <h1 class="header_text">
     STONEHENGE
 </h1>
+<script>
+    window.onload = function () {
+        $('[name=first_name]')[0].value = '{{ first_name }}';
+        $('[name=last_name]')[0].value = '{{ last_name }}';
+    }
+</script>
 <form>
     <div class="forma">
         <div style="padding: 10px;">
             <label>
-                <input type="text" name="login" placeholder="email"
+                <input type="text" name="login" placeholder="login"
                        class="form-control cus_inp"><br/>
-                <input type="text" name="first-name" placeholder="First name"
+                <input type="text" name="first_name" placeholder="First name"
                        class="form-control cus_inp"><br/>
-                <input type="text" name="last-name" placeholder="Last name"
+                <input type="text" name="last_name" placeholder="Last name"
                        class="form-control cus_inp"><br/>
-                <input type="password" name="repeat-password"
-                       placeholder="repeat password"
-                       class="form-control cus_inp"><br/>
+                {% if way_aunt == 'custom' %}
+                    <input type="text" name="email" placeholder="email"
+                           class="form-control cus_inp"><br/>
+                    <input type="password" name="repeat-password"
+                           placeholder="repeat password"
+                           class="form-control cus_inp"><br/>
+                {% endif %}
             </label>
             <div class="user-mission">
                 <label for="student"><input type="radio"
                                             id="student"
                                             name="mission"
-                                            checked="checked">
+                                            checked="checked"
+                                            value="student">
                     student
                 </label>
                 <label for="teacher"><input type="radio"
                                             id="teacher"
-                                            name="mission">
+                                            name="mission"
+                                            value="teacher">
                     teacher
                 </label>
                 <label for="advertiser"><input type="radio"
                                                id="advertiser"
-                                               name="mission">
+                                               name="mission"
+                                               value="advertiser">
                     advertiser
                 </label>
             </div>
         </div>
         <br/>
         <div style="padding: 10px;">
+            {% if key_pre_auth %}
+                <input type="hidden" value="{{ key_pre_auth }}" name="key_pre_auth">
+            {% endif %}
             <input
+                    formmethod="get"
+                    formaction="/registration"
                     class="btn-info custom-btn"
-                    src="/login"
                     type="button"
                     value="<= back">
             <input
+                    formmethod="post"
+                    formaction="/finish_registration"
                     class="btn-info custom-btn"
-                    src="/login"
-                    type="button"
+                    type="submit"
                     value="sign up">
         </div>
     </div>

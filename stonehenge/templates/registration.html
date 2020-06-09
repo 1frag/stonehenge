@@ -63,6 +63,7 @@
     .oauth_block {
         border: 1px darkgray solid;
         padding: 10px;
+        border-radius: 8px;
         width: 350px;
         background-color: #33CCCC33;
     }
@@ -72,30 +73,8 @@
         margin-top: -10px;
         width: 350px;
     }
-
-    .user-mission {
-        font-size: 20px;
-        list-style-type: none;
-        margin-left: 30px;
-        padding: 0;
-    }
-
-    .user-mission li {
-        float: left;
-        margin: 0 5px 0 0;
-    }
-
-    .user-mission label {
-        padding: 5px;
-        border: 1px solid #33CCCC33;
-        cursor: pointer;
-    }
-
-    .user-mission label:hover {
-        background: #33CCCC33;
-    }
 </style>
-<body><br/>
+<body>
 <h1 class="header_text">
     STONEHENGE
 </h1>
@@ -113,19 +92,21 @@
                    class="btn-info custom-btn"><br/>
             <br/>
             <p style='font-size: 24px; text-align: center'>or</p>
-            <div class="oauth_block">
+            <button class="oauth_block custom-btn" formaction="/oauth/google"
+                    formmethod="post">
                 <img src="/static/images/google.png"
                      alt="google" height="30px" width="30px">
                 Sign up with Google
-            </div>
-            <br/>
+            </button>
+            <br/><br/>
+            <button class="oauth_block custom-btn"
+                    style="margin-top: -15px">
+                <img src="/static/images/vk.png"
+                     alt="google" height="30px" width="30px">
+                Sign up with VK
+            </button>
         </div>
-        <div class="oauth_block"
-             style="margin-top: -15px">
-            <img src="/static/images/vk.png"
-                 alt="google" height="30px" width="30px">
-            Sign up with VK
-        </div>
+
         <br/>
         <div style="padding: 10px;">
             <p style='font-size: 24px; text-align: center'>or</p>

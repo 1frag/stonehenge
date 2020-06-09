@@ -38,13 +38,10 @@ def get_config(test=False, readable=False):
             'password': os.getenv('ADMIN_PASSWORD', 'admin'),
         },
         'postgres': get_db_url(test, readable),
+        'redis': os.getenv('REDIS_URL', 'redis://:redis@redis/')
     }
     return options
 
 
 def init_config(app: web.Application) -> None:
     app['config'] = get_config()
-
-
-def get_cur_ip():
-    return '172.0.0.1'

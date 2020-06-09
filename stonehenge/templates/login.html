@@ -65,6 +65,7 @@
         width: 350px;
         background-color: #33CCCC33;
     }
+
     .cus_inp {
         margin-left: 20px;
         margin-top: -10px;
@@ -78,36 +79,35 @@
 <form>
     <div class="forma">
         <div style="padding: 10px;">
-        <label>
-            <input type="text" name="login" placeholder="login"
-            class="form-control cus_inp"><br/>
-            <input type="password" name="passw" placeholder="password"
-            class="form-control cus_inp"><br/>
-            <input type="button"
-                   value="sign in"
-                   class="btn-info custom-btn"><br/>
-        </label>
-        <br/>
-        <p style='font-size: 24px; text-align: center'>or</p>
-        <div class="oauth_block">
-            <img src="/static/images/google.png"
-                 alt="google" height="30px" width="30px">
-            Sign in with Google
-        </div>
-        <br/>
-        </div>
-        <div class="oauth_block"
-             style="margin-top: -15px">
-            <img src="/static/images/vk.png"
-                 alt="google" height="30px" width="30px">
-            Sign in with VK
+            <label>
+                <input type="text" name="login" placeholder="login"
+                       class="form-control cus_inp"><br/>
+                <input type="password" name="passw" placeholder="password"
+                       class="form-control cus_inp"><br/>
+                <input type="button"
+                       value="sign in"
+                       class="btn-info custom-btn"><br/>
+            </label>
+            <br/>
+            <p style='font-size: 24px; text-align: center'>or</p>
+            <button class="oauth_block custom-btn" formaction="/oauth/google">
+                <img src="/static/images/google.png"
+                     alt="google" height="30px" width="30px">
+                Sign in with Google
+            </button>
+            <br/>
+            <button class="oauth_block custom-btn">
+                <img src="/static/images/vk.png"
+                     alt="google" height="30px" width="30px">
+                Sign in with VK
+            </button>
         </div>
         <br/>
         <div style="padding: 10px;">
             <p style='font-size: 24px; text-align: center'>or</p>
             <input
                     class="btn-info custom-btn"
-                    src="/registration"
+                    onclick="document.location.href = '/registration'"
                     type="button"
                     value="sign up">
         </div>

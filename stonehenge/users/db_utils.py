@@ -4,6 +4,8 @@ from typing import Union, Optional
 import logging
 import psycopg2
 import psycopg2.errors
+import aiohttp_session
+import aiohttp.web
 
 from stonehenge.type_helper import *
 
@@ -80,6 +82,11 @@ async def get_user_by_google(conn: SAConnection, google_user_id: int):
     select id from app_users
     where google_id = %s;
     ''', (google_user_id,))).fetchone())[0]
+
+
+async def remember_user(request: 'Request', user_id: int):
+    session = await aiohttp_session.get_session(request)
+    session['user_id'] = user_id
 
 
 class AlreadyRegistered(Exception):

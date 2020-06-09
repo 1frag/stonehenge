@@ -15,6 +15,7 @@ import aiohttp_session
 
 from stonehenge.users.db_utils import (
     select_all_users, create_user, AlreadyRegistered, get_user_by_google,
+    remember_user,
 )
 from stonehenge.type_helper import *
 from stonehenge.constants import *
@@ -91,8 +92,7 @@ async def finish_registration(request: 'Request') -> NoReturn:
                 )
             except AlreadyRegistered:
                 user_id = await get_user_by_google(conn, id_g_user)
-        session = await aiohttp_session.get_session(request)
-        session['user_id'] = user_id
+        await remember_user(request, id_g_user)
         raise aiohttp.web.HTTPFound('/')
     else:
         email = request.query.get('email')
@@ -159,6 +159,15 @@ async def callback_by_google(request: 'Request'):
                 if 'error' in guser:
                     raise error
                 logger.info(guser)
+
+    try:
+        async with request.app.db.acquire() as conn:
+            user_id = await get_user_by_google(conn, guser['id'])
+            await remember_user(request, user_id)
+    except Exception as e:
+        logger.debug(f'{e.__class__}: {e}')
+    else:
+        raise aiohttp.web.HTTPFound('/')
 
     try:
         cur_uuid = uuid.uuid4().hex

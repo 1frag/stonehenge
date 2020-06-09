@@ -17,3 +17,10 @@ logs:
 # connect to production server
 connect:
 	heroku run /bin/bash
+
+# run server locally without docker-compose
+runall:
+	docker-compose up -d
+
+restart_app:
+	docker-compose restart stonehenge_app

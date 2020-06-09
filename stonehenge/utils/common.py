@@ -1,5 +1,6 @@
 import os
 import pathlib
+import socket
 
 from aiohttp import web
 
@@ -12,7 +13,7 @@ def get_db_url(test=False, readable=False):
             'dsn': os.getenv('DATABASE_URL')
         }
     info = {
-        'host': get_ip_from_container('stonehenge_postgres') or 'postgres',
+        'host': 'postgres',
         'port': 5432,
         'user': 'test_user' if test else 'postgres',
         'password': 'postgres',
@@ -30,21 +31,17 @@ def get_config(test=False, readable=False):
         'app': {
             'host': os.getenv('HOST', '0.0.0.0'),
             'port': os.getenv('PORT', 8080),
+            'domain': os.getenv('DOMAIN', 'http://localhost:8080'),
         },
         'admin_app': {
             'username': os.getenv('ADMIN_USERNAME', 'admin'),
             'password': os.getenv('ADMIN_PASSWORD', 'admin'),
         },
         'postgres': get_db_url(test, readable),
+        'redis': os.getenv('REDIS_URL', 'redis://:redis@redis/')
     }
     return options
 
 
 def init_config(app: web.Application) -> None:
     app['config'] = get_config()
-
-
-def get_ip_from_container(name):
-    fmt = '{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}'
-    ip = os.popen(f"docker inspect --format='{fmt}' {name}").read()
-    return ip.strip()

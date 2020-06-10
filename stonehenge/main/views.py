@@ -15,7 +15,7 @@ import aiohttp_session
 
 from stonehenge.users.db_utils import (
     select_all_users, create_user, AlreadyRegistered, get_user_by_google,
-    remember_user, get_user_by_vk,
+    remember_user, get_user_by_vk, select_user_by_id,
 )
 from stonehenge.type_helper import *
 from stonehenge.constants import *
@@ -24,16 +24,20 @@ logging.basicConfig(
     level='DEBUG',
     format='%(levelname)s: [%(name)s at %(lineno)d] %(message)s',
 )
+logging.getLogger('parso.python.diff').disabled = True
 logger = logging.getLogger('views')
 
 
 @aiohttp_jinja2.template('index.html')
 async def index(request: 'Request') -> Dict[str, str]:
+    session = await aiohttp_session.get_session(request)
+    user_id = session.get('user_id')
     async with request.app.db.acquire() as conn:
-        res = await select_all_users(conn)
-        res = list(res)
-
-    return {"text": str(res)}
+        user = await select_user_by_id(conn, user_id)
+    if user is None:
+        raise web.HTTPFound('/login')
+    u_login, mission = user
+    return {'login': u_login, 'mission': mission}
 
 
 @aiohttp_jinja2.template('login.html')

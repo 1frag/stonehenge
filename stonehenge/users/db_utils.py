@@ -50,19 +50,30 @@ async def create_user(
         logger.error(f'Incorrect mission type {mission=}')
         raise Exception('incorrect mission')
 
-    if google_user:
+    if google_user or vk_user:
         trans = None
         try:
             trans = await conn.begin()  # type: Optional[RootTransaction]
-            res = await conn.execute('''
-            insert into app_google_users (google_id)
-            values (%s);
-            insert into app_users (login, first_name, last_name, email, google_id,
-            mission, auth_type)
-            values (%s, %s, %s, %s, %s, %s, 'google')
-            returning id;
-            ''', google_user, login, first_name, last_name, email,
-                                     google_user, mission)  # type: ResultProxy
+            if google_user:
+                res = await conn.execute('''
+                insert into app_google_users (google_id)
+                values (%s);
+                insert into app_users (login, first_name, last_name, email, google_id,
+                mission, auth_type)
+                values (%s, %s, %s, %s, %s, %s, 'google')
+                returning id;
+                ''', google_user, login, first_name, last_name, email,
+                                         google_user, mission)  # type: ResultProxy
+            else:
+                res = await conn.execute('''
+                insert into app_vk_users (vk_id)
+                values (%s);
+                insert into app_users (login, first_name, last_name, email, vk_id,
+                mission, auth_type)
+                values (%s, %s, %s, %s, %s, %s, 'vk')
+                returning id;
+                ''', vk_user, login, first_name, last_name, email,
+                                         vk_user, mission)  # type: ResultProxy
             ret_id = await res.fetchone()  # type: RowProxy
             await trans.commit()
             return ret_id[0]
@@ -71,7 +82,9 @@ async def create_user(
                 logger.error(f'{e.pgcode=}')
                 await trans.rollback()
             if psycopg2.errors.lookup(e.pgcode).__name__ == 'UniqueViolation':
+                logger.error(f'{e.pgcode=}, {e.pgerror=}')
                 raise AlreadyRegistered() from None
+            raise e
     else:
         logger.error(f'{pwd_way=}')
         raise NotImplementedError()
@@ -82,6 +95,13 @@ async def get_user_by_google(conn: SAConnection, google_user_id: int):
     select id from app_users
     where google_id = %s;
     ''', (google_user_id,))).fetchone())[0]
+
+
+async def get_user_by_vk(conn: SAConnection, vk_user_id: int):
+    return (await (await conn.execute('''
+    select id from app_users
+    where vk_id = %s;
+    ''', (vk_user_id,))).fetchone())[0]
 
 
 async def remember_user(request: 'Request', user_id: int):

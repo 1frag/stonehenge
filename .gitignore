@@ -106,5 +106,5 @@ venv.bak/
 # custom ignore files
 /stonehenge/_if_*
 /prod.env
-/stonehenge/static/js/node_modules/
-/stonehenge/static/js/package-lock.json
+**package-lock.json
+**node_modules

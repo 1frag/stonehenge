@@ -10,7 +10,8 @@ from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
 from stonehenge.main.views import (
     index, login_by_google, callback_by_google, login,
-    registration, reg_next, finish_registration,
+    registration, reg_next, finish_registration, login_by_vk,
+    callback_by_vk,
 )
 from stonehenge.type_helper import *
 
@@ -39,6 +40,9 @@ def init_routes(app: 'Application') -> None:
 
     add_route('*', '/oauth/google', login_by_google)
     add_route('*', '/oauth/_google', callback_by_google)
+
+    add_route('*', '/oauth/vk', login_by_vk)
+    add_route('*', '/oauth/_vk', callback_by_vk)
 
     # added static dir
     static = PROJECT_PATH / 'static'

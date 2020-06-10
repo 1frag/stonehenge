@@ -12,9 +12,191 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
             integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
             crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          rel="stylesheet"/>
+
     <title>Start page</title>
 </head>
+<style>
+    [data-toggle="collapse"]:after {
+        display: inline-block;
+        font: normal normal normal 14px/1 FontAwesome;
+        font-size: inherit;
+        text-rendering: auto;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        content: "\f054";
+        transform: rotate(90deg);
+        transition: all linear 0.25s;
+    }
+
+    [data-toggle="collapse"].collapsed:after {
+        transform: rotate(0deg);
+    }
+
+    body {
+        background-color: #F8F3F2;
+    }
+
+    .bg-custom {
+        background-color: #1a1f3355;
+    }
+
+    li {
+        font-size: 18px;
+    }
+
+    .hi_text {
+        padding: 10px;
+        margin-left: 200px;
+    }
+
+    .custom-card-body {
+        background-color: #64A1CE40;
+    }
+
+    .radius-able {
+        border-radius: 1.2rem;
+    }
+
+    .custom-card {
+        width: 18rem;
+        background-color: #0000;
+        border-color: #0000;
+        margin-top: 40px;
+    }
+
+    .my-btn {
+        vertical-align: middle;
+        -ms-touch-action: manipulation;
+        touch-action: manipulation;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+
+    .main-console {
+        overflow: auto;
+        border-radius: 1.2rem;
+        margin-top: 40px;
+        height: 610px;
+        border: 2px darkgray solid;
+    }
+
+    .message {
+        background-color: #00636344;
+        border-radius: 0.7rem;
+        padding: 10px;
+        margin: 10px;
+        border: 2px darkgray solid;
+    }
+
+    ::-webkit-scrollbar {
+        width: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #888;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+    }
+</style>
 <body>
-from db: {{ text }}
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-custom">
+        <a class="navbar-brand" href="#">Stonehenge</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+                aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link txt_nav_bar" href="#">Profile</a>
+                </li>
+                <li>
+                    <a class="nav-link txt_nav_bar" href="#">Settings</a>
+                </li>
+                <li>
+                    <a class="nav-link txt_nav_bar" href="#">Sign out</a>
+                </li>
+                <li class="hi_text txt_nav_bar">
+                    Welcome, {{ login }} ({{ mission }})
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="col-4 float-left">
+        {% if mission == 'teacher' %}
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                 style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#">Tests</a></h5>
+                    <p class="card-text">Here you can create new test
+                        and follow their statistics</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                 style="background-color: #d9945066">
+                    <h5 class="card-title"><a href="#">Training videos</a></h5>
+                    <p class="card-text">Here you can upload training
+                        videos and follow their statistics</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                 style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#">Video calls with students</a></h5>
+                    <p class="card-text">Here you can call students or find them</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                 style="background-color: #d9945066">
+                    <h5 class="card-title"><a href="#">Writing</a></h5>
+                    <p class="card-text">Here you can check student work
+                        and add tasks</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="col-8 float-right main-console">
+        {% for _ in range(10) %}
+            <div class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diem
+                nonummy nibh euismod tincidunt ut lacreet dolore magna aliguam erat volutpat.
+                Ut wisis enim ad minim veniam, quis nostrud exerci tution ullamcorper suscipit
+                lobortis nisl ut aliquip ex ea commodo consequat
+            </div>
+        {% endfor %}
+    </div>
+
+    <div style="position: absolute; bottom: 10px; left: 45%">
+        <footer class="page-footer font-small blue">
+            <div class="footer-copyright text-center py-3">© 2020 No copyright:
+                <a href="http://localhost:8080/"> http://localhost:8080/</a>
+            </div>
+        </footer>
+        <div>
+        </div>
+
 </body>
 </html>

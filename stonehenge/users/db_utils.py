@@ -1,6 +1,6 @@
 from aiopg.sa import SAConnection
 from aiopg.sa.result import RowProxy
-from typing import Union, Optional
+from typing import Union, Optional, Tuple
 import logging
 import psycopg2
 import psycopg2.errors
@@ -12,19 +12,22 @@ from stonehenge.type_helper import *
 logger = logging.getLogger(__name__)
 
 
-async def select_user_by_id(conn: SAConnection, key: int) -> RowProxy:
-    return await (
+async def select_user_by_id(conn: SAConnection, key: int) -> Optional[Tuple[str, str]]:
+    if key is None:
+        return None
+    if res := await (
         await conn.execute('''
-        select (login, mission, auth_type) from app_users
-        where id = %d
+        select login, mission from app_users
+        where id = %s
     ''', (key,))
-    ).fetchone()
+    ).fetchone():
+        return res.as_tuple()
 
 
 async def select_all_users(conn: SAConnection) -> RowProxy:
     return await (
         await conn.execute('''
-            select (login, mission, auth_type) from app_users
+            select login, mission, auth_type from app_users
         ''')
     ).fetchmany()
 

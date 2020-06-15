@@ -14,6 +14,7 @@ import aioredis
 
 from stonehenge.routes import init_routes, init_sessions, init_redis
 from stonehenge.utils.common import init_config
+from stonehenge.main.middleware import init_middlewares
 from stonehenge.constants import *
 
 path = Path(__file__).parent
@@ -50,9 +51,10 @@ class Application(web.Application):
     redis: aioredis.commands.Redis
     db: aiopg.sa.engine.Engine
     redis_installed = asyncio.Event()
+    sessions_installed = asyncio.Event()
 
 
-def init_app(config: Optional[List[str]] = None) -> web.Application:
+def init_app(config: Optional[List[str]] = None) -> 'Application':
     app = Application()
     init_config(app)
     init_jinja2(app)
@@ -62,6 +64,7 @@ def init_app(config: Optional[List[str]] = None) -> web.Application:
     ])
     app.on_startup.extend([
         init_redis,
-        init_sessions,
+        init_sessions,  # after init_redis
+        init_middlewares,  # after init_sessions
     ])
     return app

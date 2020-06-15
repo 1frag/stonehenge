@@ -27,6 +27,7 @@ async def init_sessions(app: 'Application'):
     await app.redis_installed.wait()
     storage = aiohttp_session.redis_storage.RedisStorage(app.redis)
     aiohttp_session.setup(app, storage)
+    app.sessions_installed.set()
 
 
 def init_routes(app: 'Application') -> None:

@@ -15,7 +15,7 @@ import aiohttp_session
 
 from stonehenge.users.db_utils import (
     select_all_users, create_user, AlreadyRegistered, get_user_by_google,
-    remember_user, get_user_by_vk, select_user_by_id,
+    remember_user, get_user_by_vk, select_user_by_id, prepare_index_page_for_teacher,
 )
 from stonehenge.type_helper import *
 from stonehenge.constants import *
@@ -30,30 +30,37 @@ logger = logging.getLogger('views')
 
 @aiohttp_jinja2.template('index.html')
 async def index(request: 'Request') -> Dict[str, str]:
-    session = await aiohttp_session.get_session(request)
-    user_id = session.get('user_id')
-    async with request.app.db.acquire() as conn:
-        user = await select_user_by_id(conn, user_id)
-    if user is None:
+    if request.user is None:
         raise web.HTTPFound('/login')
-    u_login, mission = user
-    return {'login': u_login, 'mission': mission}
+
+    async with request.app.db.acquire() as conn:
+        data = {'login': request.user.login,
+                'mission': request.user.mission}
+        if request.user.mission == 'teacher':
+            data.update(await prepare_index_page_for_teacher(conn, request.user.id))
+    return data
 
 
 @aiohttp_jinja2.template('login.html')
 async def login(request: 'Request') -> Dict[str, str]:
-    return {}
+    if request.user is None:
+        return {}
+    raise web.HTTPFound('/')
 
 
 @aiohttp_jinja2.template('registration.html')
 async def registration(request: 'Request') -> Dict[str, str]:
-    return {}
+    if request.user is None:
+        return {}
+    raise web.HTTPFound('/')
 
 
 @aiohttp_jinja2.template('reg_next.html')
 async def reg_next(request: 'Request') -> Dict[str, str]:
     logger.info(request.method)
     session = await aiohttp_session.get_session(request)
+    if request.user is not None:
+        raise web.HTTPFound('/')
     if session.get('way_aunt') not in ['custom', 'google', 'vk']:
         logger.debug(f'{session.get("way_aunt")=} so redirect to /registration')
         raise web.HTTPFound('/registration')

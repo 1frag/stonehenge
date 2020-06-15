@@ -1,4 +1,5 @@
-from typing import List, TYPE_CHECKING
+from typing import List, TYPE_CHECKING, Optional, Tuple
+from collections import namedtuple
 
 if TYPE_CHECKING:
     import aiopg.sa.result
@@ -6,9 +7,8 @@ if TYPE_CHECKING:
     import aiohttp.web
     import aiopg.sa.engine
 
-    from aiopg.sa.transaction import RootTransaction
-
     from stonehenge.app import Application
+    from stonehenge.users.db_utils import UserInformation
 
     RowsProxy = List[aiopg.sa.result.RowProxy]
     ResultProxy = aiopg.sa.result.ResultProxy
@@ -16,3 +16,4 @@ if TYPE_CHECKING:
 
     class Request(aiohttp.web.Request):
         app: Application
+        user: UserInformation

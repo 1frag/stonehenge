@@ -130,5 +130,12 @@ async def prepare_index_page_for_teacher(conn: SAConnection, user_id: int):
     }
 
 
+async def get_levels(conn: SAConnection):
+    return list(await (await conn.execute('''
+        select name from app_levels
+        order by force;
+        ''')).fetchall())
+
+
 class AlreadyRegistered(Exception):
     pass

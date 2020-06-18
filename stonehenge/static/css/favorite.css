@@ -1,0 +1,36 @@
+.radio-btn {
+    list-style-type: none;
+    padding: 0;
+}
+
+.radio-btn li {
+    float: left;
+    margin: 0 5px 0 0;
+}
+
+.radio-btn label {
+    padding: 5px;
+    border: 1px solid #33CCCC33;
+    cursor: pointer;
+}
+
+.radio-btn label:hover {
+    background: #33CCCC33;
+}
+
+.txt-pretty {
+    font-family: "Droid Serif", "DejaVu Serif", "STIX", serif;
+    font-size: 15px;
+}
+
+#ca-plus-ans {
+    background-color: #55555555;
+    width: 50px;
+    height: 50px;
+    text-align: center;
+    line-height: 50px;
+}
+
+#ca-plus-ans:hover {
+    background-color: #009999;
+}

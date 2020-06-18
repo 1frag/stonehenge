@@ -8,11 +8,7 @@ import aiohttp_session
 import aiohttp_session.redis_storage
 from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
-from stonehenge.main.views import (
-    index, login_by_google, callback_by_google, login,
-    registration, reg_next, finish_registration, login_by_vk,
-    callback_by_vk,
-)
+from stonehenge.main.views import *
 from stonehenge.type_helper import *
 
 PROJECT_PATH = pathlib.Path(__file__).parent
@@ -44,6 +40,10 @@ def init_routes(app: 'Application') -> None:
 
     add_route('*', '/oauth/vk', login_by_vk)
     add_route('*', '/oauth/_vk', callback_by_vk)
+
+    add_route('GET', '/tests/new', create_new_test)
+    add_route('POST', '/tests/new', create_new_test)
+    add_route('GET', r'/tests/{test_id:\d+}', read_test)
 
     # added static dir
     static = PROJECT_PATH / 'static'

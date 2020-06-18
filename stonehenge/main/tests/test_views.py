@@ -10,11 +10,11 @@ async def test_view(client: aiohttp_client) -> None:
 async def test_execute_anything():
     """
     Use:
-    >>> from stonehenge.main.tests.test_views import test_execute_anything
-    >>> db_state = test_execute_anything()
-    >>> conn = await db_state.__anext__()
-    >>> ...
-    >>> await db_state.__anext__()
+    from stonehenge.main.tests.test_views import test_execute_anything
+    db_state = test_execute_anything()
+    conn = await db_state.__anext__()
+    ...
+    await db_state.__anext__()
     """
     import aiopg.sa
     from stonehenge.utils.common import get_config

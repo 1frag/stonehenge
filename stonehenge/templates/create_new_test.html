@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+    >
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="icon" href="{{ url('static', filename='images/favicon.ico') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+            crossorigin="anonymous"></script>
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+          rel="stylesheet"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
+          rel="stylesheet"/>
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <link href="/static/css/favorite.css" rel="stylesheet">
+    <script src="/static/js/create_new_test.js"></script>
+
+    <title>Create new test</title>
+</head>
+<body>
+<div class="container">
+    <nav class="navbar navbar-expand-lg navbar-light bg-custom">
+        <a class="navbar-brand" href="#">Stonehenge</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+                aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link txt_nav_bar" href="#">Profile</a>
+                </li>
+                <li>
+                    <a class="nav-link txt_nav_bar" href="#">Settings</a>
+                </li>
+                <li>
+                    <a class="nav-link txt_nav_bar" href="#">Sign out</a>
+                </li>
+                <li class="hi_text txt_nav_bar">
+                    Welcome, {{ login }} ({{ mission }})
+                </li>
+            </ul>
+        </div>
+    </nav>
+
+    <form id="creating-form" onsubmit="createSubmit(this)" method="post">
+        <div class="alert alert-danger" id="error-alert">
+            <button type="button" class="close"
+                    onclick="$('#error-alert').fadeOut();">x</button>
+            <strong>Error! </strong>
+            <div id="reason-to-fail"></div>
+        </div>
+        <div class="col-12 txt-pretty"><br/>
+            <h4>Question:</h4>
+            <textarea name="question_txt" style="width: 45%" rows=4></textarea><br/>
+            <label for="question_file">Choose file to upload</label>
+            <input type="file" name="question_file" id="question_file" value="file">
+            <br/><br/>
+            <h4>Answer:</h4>
+            <ul class="radio-btn" id="answer-kind">
+                <li class="txt-pretty">
+                    <input type="radio" name="al" checked="checked" value="plain-text" id="rpt">
+                    <label for="rpt">plain text as answer</label>
+                </li>
+                <li class="txt-pretty">
+                    <input type="radio" name="al" value="choice" id="rca">
+                    <label for="rca">choice of answer</label>
+                </li>
+            </ul>
+            <br><br>
+            <div id="bpt" style="display: block">
+                <input type="text" placeholder="enter the correct answer"
+                       style="width: 45%" name="cor-answer"><br>
+                <input type="checkbox" class="custom-checkbox" checked
+                       name="case-ins">case insensitive
+            </div>
+            <div id="bca" style="display: none">
+                <table class="table" id="table-with-answers">
+                    <thead>
+                    <tr>
+                        <th scope="col">text</th>
+                        <th scope="col">is true?</th>
+                        <th scope="col">removing</th>
+                    </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <div id="ca-plus-ans" class="btn-info my-btn">+</div>
+            </div>
+            <br/>
+            <h4>Level:</h4>
+            {% for i, l in levels %}
+                <input type="checkbox" id="l{{ i }}" name="levels" value="{{ l['name'] }}">
+                <label for="l{{ i }}">{{ l['name'] }}</label><br/>
+            {% endfor %}
+            <input type="button" value="Submit" class="btn"
+                   style="margin: 30px; padding: 15px; background-color: #33333344" onclick="createSubmit()">
+        </div>
+    </form>
+
+    <footer class="page-footer font-small blue">
+        <div class="footer-copyright text-center py-3">© 2020 No copyright:
+            <a href="http://localhost:8080/"> http://localhost:8080/</a>
+        </div>
+    </footer>
+
+</body>
+</html>

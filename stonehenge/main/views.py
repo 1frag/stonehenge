@@ -5,18 +5,12 @@ from aiohttp import web
 import ssl
 import certifi
 import aiohttp
-import socket
 from typing import NoReturn
 import json
-from urllib.parse import urlencode
-import logging
+from urllib.parse import urlencode, parse_qs
 import uuid
-import aiohttp_session
 
-from stonehenge.users.db_utils import (
-    select_all_users, create_user, AlreadyRegistered, get_user_by_google,
-    remember_user, get_user_by_vk, select_user_by_id, prepare_index_page_for_teacher,
-)
+from stonehenge.users.db_utils import *
 from stonehenge.type_helper import *
 from stonehenge.constants import *
 
@@ -296,3 +290,39 @@ async def callback_by_vk(request: 'Request'):
         logger.warning(f'{e}, {e.__class__}')
 
     return web.HTTPFound('/reg_next')
+
+
+@aiohttp_jinja2.template('create_new_test.html')
+async def create_new_test(request: 'Request'):
+    if request.user and request.user.mission == 'teacher':
+        if request.method == 'GET':
+            async with request.app.db.acquire() as conn:
+                levels = await get_levels(conn)
+            return {'levels': enumerate(levels)}
+        elif request.method == 'POST':
+            clean_data, reason = request.app.test_ctrl.validate(await request.post())
+            if clean_data is None:
+                raise web.HTTPBadRequest(reason=reason)
+            clean_data.update({'author': request.user.id})
+            async with request.app.db.acquire() as conn:
+                test_id = await request.app.test_ctrl.create_new_test(**clean_data, conn=conn)
+            raise web.HTTPFound(f'/tests/{test_id}')
+
+    logger.info('unsuccessful result on page create_new_test by '
+                f'{request.user=}')
+    raise web.HTTPFound('/')
+
+
+async def read_test(request: 'Request'):
+    async with request.app.db.acquire() as conn:
+        test_id = request.match_info.get('test_id')
+        res = await conn.execute('''
+        select * from app_tests
+        where id = %s''', (test_id, ))
+
+        if one := await res.fetchone():
+            return web.Response(body=str(dict(one.items())))
+        raise web.json_response({
+            'error': '???',
+            'test_id': test_id,
+        })

@@ -15,6 +15,7 @@ import aioredis
 from stonehenge.routes import init_routes, init_sessions, init_redis
 from stonehenge.utils.common import init_config
 from stonehenge.main.middleware import init_middlewares
+from stonehenge.controllers import TestController
 from stonehenge.constants import *
 
 path = Path(__file__).parent
@@ -52,6 +53,10 @@ class Application(web.Application):
     db: aiopg.sa.engine.Engine
     redis_installed = asyncio.Event()
     sessions_installed = asyncio.Event()
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.test_ctrl = TestController()
 
 
 def init_app(config: Optional[List[str]] = None) -> 'Application':

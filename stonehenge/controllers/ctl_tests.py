@@ -4,6 +4,8 @@ from aiohttp import web
 from aiopg.sa import SAConnection
 from typing import Optional, Tuple, Dict, Union
 from multidict import MultiMapping
+import psycopg2
+import psycopg2.errors
 
 logger = logging.getLogger(__name__)
 
@@ -77,5 +79,16 @@ class TestController:
         ''', (test_id, levels))).fetchall()
         return test_id
 
-    async def next_for_exam(self, user_id: int, conn: SAConnection):
-        pass
+    async def get_next_test(self, user_id: int, conn: SAConnection):
+        try:
+            res = await conn.execute('''select get_next_test(%s);''', (user_id, ))
+            return await res.fetchone()
+        except psycopg2.Error as e:
+            if psycopg2.errors.lookup(e.pgcode).__name__ == 'RaiseException':
+                if e.pgerror == 'UserMustSetLevel':
+                    raise UserMustSetLevel
+            raise e
+
+
+class UserMustSetLevel(Exception):
+    pass

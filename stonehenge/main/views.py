@@ -13,6 +13,7 @@ import uuid
 from stonehenge.users.db_utils import *
 from stonehenge.type_helper import *
 from stonehenge.constants import *
+from stonehenge.controllers import *
 
 logging.basicConfig(
     level='DEBUG',
@@ -342,6 +343,16 @@ async def exam_test(request: 'Request'):
         raise web.HTTPFound('/')
 
     async with request.app.db.acquire() as conn:
-        await request.app.test_ctrl.next_for_exam(
-            request.user.id, conn
-        )
+        try:
+            data = await request.app.test_ctrl.get_next_test(
+                request.user.id, conn
+            )
+        except UserMustSetLevel:
+            # todo: future task will create page /profile
+            #  and there we catch this flag to show error
+            raise web.HTTPFound('/profile?set_up_level')
+        if data is None:
+            return aiohttp_jinja2.render_template(
+                'error.html', request, {'error': 'there is no tests'}
+            )
+        return {'test': data}

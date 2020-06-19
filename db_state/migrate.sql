@@ -145,8 +145,8 @@ create or replace function create_new_user(
     cur_last_name varchar(64),
     cur_mission user_mission,
     cur_password varchar(256),
-    google_user int,
-    vk_user int
+    google_user decimal,
+    vk_user decimal
 ) returns int as
 $$
 declare
@@ -178,6 +178,33 @@ begin
             cur_email, google_user, vk_user, cur_mission,
             cur_auth_type, cur_password, student_meta)
     returning id into result;
+
+    return result;
+end;
+$$ language plpgsql;
+
+create or replace function get_next_test(
+    student int
+) returns int as
+$$
+declare
+    student_level int;
+    result int;
+begin
+    select asm.level_id into student_level from app_users au
+    join app_student_meta asm on au.student_meta_id = asm.id
+    where au.student_meta_id = asm.id and au.id = student;
+
+    if student_level is null then
+        raise 'UserMustSetLevel';
+    end if;
+
+    select t.id into result from app_tests t
+    where t.id not in (
+        select test from app_marks m
+        where m.solver = student
+    ) and test_suitable_for_student(student, t.id)
+    order by t.id limit 1;
 
     return result;
 end;

@@ -1,1 +1,1 @@
-from .ctl_tests import TestController
+from .ctl_tests import TestController, UserMustSetLevel

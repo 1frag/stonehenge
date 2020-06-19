@@ -7,5 +7,18 @@
     Exam page
 {% endblock %}
 {% block main %}
-    {{ test }}
+    <div class="container">
+        {{ test['querstion_txt'] }}
+        <br/>
+        <img width="300px" height="300px"
+             src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
+        <br/><br/>
+        {% if test['type_answer'] == 'ch' %}
+            <ul>
+            {% for ch in test['choice'] %}
+                <li>{{ ch }}</li>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
 {% endblock %}

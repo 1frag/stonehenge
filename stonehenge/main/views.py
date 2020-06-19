@@ -9,6 +9,7 @@ from typing import NoReturn
 import json
 from urllib.parse import urlencode, parse_qs
 import uuid
+import base64
 
 from stonehenge.users.db_utils import *
 from stonehenge.type_helper import *
@@ -332,7 +333,7 @@ async def read_test(request: 'Request'):
         test_id = request.match_info.get('test_id')
         res = await conn.execute('''
         select * from app_tests
-        where id = %s''', (test_id, ))
+        where id = %s''', (test_id,))
 
         if one := await res.fetchone():
             return web.Response(body=str(dict(one.items())))
@@ -361,4 +362,7 @@ async def exam_test(request: 'Request'):
             return aiohttp_jinja2.render_template(
                 'error.html', request, {'error': 'there is no tests'}
             )
-        return {'test': data}
+        test = dict((await (await conn.execute('''select * from app_tests
+        where id = %s''', data)).fetchone()).items())
+        test['question_bytes'] = base64.encodebytes(test['question_bytes'])
+        return {'test': test}

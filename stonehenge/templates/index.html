@@ -62,9 +62,9 @@
                     <p class="card-text">Here you can create new test
                         and follow their statistics</p>
                     <p>{{ created_tests }} tests created
-                        <a href="/tests/new">(создать новый)</a></p>
+                        <a href="/tests/new">(create new)</a></p>
                     <p>{{ sol_received }} solutions received
-                        <a href="/tests/">(смотреть статистику)</a></p>
+                        <a href="/tests/">(see stats)</a></p>
                 </div>
             </div>
             <div class="card custom-card my-btn">
@@ -90,7 +90,45 @@
                         and add tasks</p>
                 </div>
             </div>
+        {% elif mission == 'student' %}
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#" onclick="tests()">Tests</a></h5>
+                    <p class="card-text">Here you can pass tests
+                        and follow their statistics</p>
+                    <p>{{ created_tests }} tests created
+                        <a href="/tests/exam">(start testing)</a></p>
+                    <p>{{ sol_received }} solutions received
+                        <a href="/tests/stats">(see stats)</a></p>
+                </div>
+            </div>
+            {# todo: other block don't follow real description #}
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d9945066">
+                    <h5 class="card-title"><a href="#">Training videos</a></h5>
+                    <p class="card-text">Here you can upload training
+                        videos and follow their statistics</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#">Video calls with students</a></h5>
+                    <p class="card-text">Here you can call students or find them</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d9945066">
+                    <h5 class="card-title"><a href="#">Writing</a></h5>
+                    <p class="card-text">Here you can check student work
+                        and add tasks</p>
+                </div>
+            </div>
         {% endif %}
+
     </div>
 
 {#    <div class="col-8 float-right main-console" id="console">#}

@@ -56,26 +56,18 @@ async def create_user(
         trans = None
         try:
             trans = await conn.begin()  # type: Optional[RootTransaction]
-            if google_user:
-                res = await conn.execute('''
-                insert into app_google_users (google_id)
-                values (%s);
-                insert into app_users (login, first_name, last_name, email, google_id,
-                mission, auth_type)
-                values (%s, %s, %s, %s, %s, %s, 'google')
-                returning id;
-                ''', google_user, login, first_name, last_name, email,
-                                         google_user, mission)  # type: ResultProxy
-            else:
-                res = await conn.execute('''
-                insert into app_vk_users (vk_id)
-                values (%s);
-                insert into app_users (login, first_name, last_name, email, vk_id,
-                mission, auth_type)
-                values (%s, %s, %s, %s, %s, %s, 'vk')
-                returning id;
-                ''', vk_user, login, first_name, last_name, email,
-                                         vk_user, mission)  # type: ResultProxy
+            res = await conn.execute('''
+            select create_new_user(
+                %s, -- cur_login
+                %s, -- cur_email
+                %s, -- cur_first_name
+                %s, -- cur_last_name
+                %s, -- cur_mission
+                %s, -- cur_password
+                %s, -- google_user
+                %s -- vk_user
+            );''', (login, email, first_name, last_name, mission,
+                    password, google_user, vk_user))  # type: ResultProxy
             ret_id = await res.fetchone()  # type: RowProxy
             await trans.commit()
             return ret_id[0]

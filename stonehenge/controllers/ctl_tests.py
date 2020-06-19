@@ -76,3 +76,6 @@ class TestController:
             returning id;
         ''', (test_id, levels))).fetchall()
         return test_id
+
+    async def next_for_exam(self, user_id: int, conn: SAConnection):
+        pass

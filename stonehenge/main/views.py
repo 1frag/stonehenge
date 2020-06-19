@@ -333,3 +333,15 @@ async def read_test(request: 'Request'):
             'error': '???',
             'test_id': test_id,
         })
+
+
+@aiohttp_jinja2.template('exam_test.html')
+async def exam_test(request: 'Request'):
+    if request.user is None or request.user.mission != 'student':
+        logger.info(f'{request.user=} tried exam))')
+        raise web.HTTPFound('/')
+
+    async with request.app.db.acquire() as conn:
+        await request.app.test_ctrl.next_for_exam(
+            request.user.id, conn
+        )

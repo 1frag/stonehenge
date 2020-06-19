@@ -33,8 +33,8 @@ function createSubmit() {
         url: '/tests/new',
         data: formData,
         method: 'POST',
-        success: function (response) {
-            document.body.innerText = response;
+        success: function (data, status, response) {
+            document.location.href = '/tests/' + data;
         },
         error: function (response) {
             $('#reason-to-fail')[0].innerText = response.statusText;

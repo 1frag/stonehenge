@@ -306,7 +306,14 @@ async def create_new_test(request: 'Request'):
             clean_data.update({'author': request.user.id})
             async with request.app.db.acquire() as conn:
                 test_id = await request.app.test_ctrl.create_new_test(**clean_data, conn=conn)
-            raise web.HTTPFound(f'/tests/{test_id}')
+
+            # ajax skips 302, and even the statusCode field doesn't prevent
+            # redirection, so I need to do a bad practice, and now I'm
+            # sending 202 instead of 302, the client side should open another
+            # page: / tests / {test_id}, where the test_id will be passed in
+            # the body. This code is not recommended from the RFC, but we
+            # probably need to use the net-ajax method to connect to the server,
+            return web.Response(status=202, body=f'{test_id}')  # so it's hard now
 
     logger.info('unsuccessful result on page create_new_test by '
                 f'{request.user=}')

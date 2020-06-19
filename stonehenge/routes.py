@@ -33,6 +33,7 @@ def init_routes(app: 'Application') -> None:
     add_route('*', '/login', login, name='login')
     add_route('*', '/registration', registration, name='registration')
     add_route('*', '/reg_next', reg_next, name='reg_next')
+    add_route('*', '/sign_out', sign_out, name='sign_out')
     add_route('*', '/finish_registration', finish_registration, name='finish_registration')
 
     add_route('*', '/oauth/google', login_by_google)

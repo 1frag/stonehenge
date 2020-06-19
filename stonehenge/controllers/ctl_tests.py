@@ -6,6 +6,7 @@ from typing import Optional, Tuple, Dict, Union
 from multidict import MultiMapping
 import psycopg2
 import psycopg2.errors
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -63,6 +64,8 @@ class TestController:
             file_bytes = question_bytes.file.read()
         else:
             file_bytes = question_bytes
+        if choice is not None:
+            choice = json.dumps(choice)
 
         test_id = (await (await conn.execute('''
             insert into app_tests (author, type_answer, correct, choice,

@@ -68,6 +68,12 @@ async def reg_next(request: 'Request') -> Dict[str, str]:
     }
 
 
+async def sign_out(request: 'Request'):
+    session = await aiohttp_session.get_session(request)
+    session.clear()
+    raise web.HTTPNoContent()
+
+
 async def finish_registration(request: 'Request') -> NoReturn:
     session = await aiohttp_session.get_session(request)
     way_aunt = session['way_aunt']

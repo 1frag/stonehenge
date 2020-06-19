@@ -18,6 +18,7 @@
               rel="stylesheet"/>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+        <script src="/static/js/base_script.js"></script>
         <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
               rel="stylesheet"/>
     {% endblock %}
@@ -39,16 +40,16 @@
             <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
                 <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
                     <li class="nav-item active">
-                        <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link txt_nav_bar" href="#">Profile</a>
+                        <a class="nav-link txt_nav_bar" href="/profile">Profile</a>
                     </li>
                     <li>
-                        <a class="nav-link txt_nav_bar" href="#">Settings</a>
+                        <a class="nav-link txt_nav_bar" href="/settings">Settings</a>
                     </li>
                     <li>
-                        <a class="nav-link txt_nav_bar" href="#">Sign out</a>
+                        <a class="nav-link txt_nav_bar" onclick="signOut()">Sign out</a>
                     </li>
                     <li class="hi_text txt_nav_bar">
                         Welcome, {{ login }} ({{ mission }})

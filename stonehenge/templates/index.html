@@ -18,101 +18,11 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
           rel="stylesheet"/>
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <script src="/static/js/script_index.js"></script>
 
     <title>Start page</title>
 </head>
-<style>
-    [data-toggle="collapse"]:after {
-        display: inline-block;
-        font: normal normal normal 14px/1 FontAwesome;
-        font-size: inherit;
-        text-rendering: auto;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        content: "\f054";
-        transform: rotate(90deg);
-        transition: all linear 0.25s;
-    }
-
-    [data-toggle="collapse"].collapsed:after {
-        transform: rotate(0deg);
-    }
-
-    body {
-        background-color: #F8F3F2;
-    }
-
-    .bg-custom {
-        background-color: #1a1f3355;
-    }
-
-    li {
-        font-size: 18px;
-    }
-
-    .hi_text {
-        padding: 10px;
-        margin-left: 200px;
-    }
-
-    .custom-card-body {
-        background-color: #64A1CE40;
-    }
-
-    .radius-able {
-        border-radius: 1.2rem;
-    }
-
-    .custom-card {
-        width: 18rem;
-        background-color: #0000;
-        border-color: #0000;
-        margin-top: 40px;
-    }
-
-    .my-btn {
-        vertical-align: middle;
-        -ms-touch-action: manipulation;
-        touch-action: manipulation;
-        cursor: pointer;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
-        user-select: none;
-    }
-
-    .main-console {
-        overflow: auto;
-        border-radius: 1.2rem;
-        margin-top: 40px;
-        height: 610px;
-        border: 2px darkgray solid;
-    }
-
-    .message {
-        background-color: #00636344;
-        border-radius: 0.7rem;
-        padding: 10px;
-        margin: 10px;
-        border: 2px darkgray solid;
-    }
-
-    ::-webkit-scrollbar {
-        width: 10px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #888;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-</style>
 <body>
 <div class="container">
     <nav class="navbar navbar-expand-lg navbar-light bg-custom">
@@ -143,19 +53,23 @@
         </div>
     </nav>
 
-    <div class="col-4 float-left">
+    <div class="col-12">
         {% if mission == 'teacher' %}
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
-                 style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#">Tests</a></h5>
+                     style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#" onclick="tests()">Tests</a></h5>
                     <p class="card-text">Here you can create new test
                         and follow their statistics</p>
+                    <p>{{ created_tests }} tests created
+                        <a href="/tests/new">(создать новый)</a></p>
+                    <p>{{ sol_received }} solutions received
+                        <a href="/tests/">(смотреть статистику)</a></p>
                 </div>
             </div>
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
-                 style="background-color: #d9945066">
+                     style="background-color: #d9945066">
                     <h5 class="card-title"><a href="#">Training videos</a></h5>
                     <p class="card-text">Here you can upload training
                         videos and follow their statistics</p>
@@ -163,14 +77,14 @@
             </div>
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
-                 style="background-color: #d1bd4766">
+                     style="background-color: #d1bd4766">
                     <h5 class="card-title"><a href="#">Video calls with students</a></h5>
                     <p class="card-text">Here you can call students or find them</p>
                 </div>
             </div>
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
-                 style="background-color: #d9945066">
+                     style="background-color: #d9945066">
                     <h5 class="card-title"><a href="#">Writing</a></h5>
                     <p class="card-text">Here you can check student work
                         and add tasks</p>
@@ -179,15 +93,9 @@
         {% endif %}
     </div>
 
-    <div class="col-8 float-right main-console">
-        {% for _ in range(10) %}
-            <div class="message">Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diem
-                nonummy nibh euismod tincidunt ut lacreet dolore magna aliguam erat volutpat.
-                Ut wisis enim ad minim veniam, quis nostrud exerci tution ullamcorper suscipit
-                lobortis nisl ut aliquip ex ea commodo consequat
-            </div>
-        {% endfor %}
-    </div>
+{#    <div class="col-8 float-right main-console" id="console">#}
+{#        <div id="inc"></div>#}
+{#    </div>#}
 
     <div style="position: absolute; bottom: 10px; left: 45%">
         <footer class="page-footer font-small blue">
@@ -195,8 +103,7 @@
                 <a href="http://localhost:8080/"> http://localhost:8080/</a>
             </div>
         </footer>
-        <div>
-        </div>
+    </div>
 
 </body>
 </html>

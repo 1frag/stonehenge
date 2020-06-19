@@ -10,18 +10,17 @@ import aiohttp.web
 from stonehenge.type_helper import *
 
 logger = logging.getLogger(__name__)
+UserInformation = namedtuple('User', ['id', 'login', 'mission'])
 
 
-async def select_user_by_id(conn: SAConnection, key: int) -> Optional[Tuple[str, str]]:
+async def select_user_by_id(conn: SAConnection, key: int) -> 'Optional[UserInformation]':
     if key is None:
         return None
-    if res := await (
-        await conn.execute('''
-        select login, mission from app_users
+    if res := await (await conn.execute('''
+        select id, login, mission from app_users
         where id = %s
-    ''', (key,))
-    ).fetchone():
-        return res.as_tuple()
+    ''', (key,))).fetchone():
+        return UserInformation(*res.as_tuple())  # noqa
 
 
 async def select_all_users(conn: SAConnection) -> RowProxy:
@@ -110,6 +109,32 @@ async def get_user_by_vk(conn: SAConnection, vk_user_id: int):
 async def remember_user(request: 'Request', user_id: int):
     session = await aiohttp_session.get_session(request)
     session['user_id'] = user_id
+
+
+async def prepare_index_page_for_teacher(conn: SAConnection, user_id: int):
+    # get count of created tests
+    created_tests = (await (await conn.execute('''
+    select count(*) from app_tests t
+    where t.author = %s''', (user_id,))).fetchone())[0]
+
+    # get count of solution received
+    sol_received = (await (await conn.execute('''
+    select count(*) from app_marks
+    inner join app_tests t on app_marks.test = t.id
+    where t.author = %s;
+    ''', (user_id,))).fetchone())[0]
+
+    return {
+        'created_tests': created_tests,
+        'sol_received': sol_received,
+    }
+
+
+async def get_levels(conn: SAConnection):
+    return list(await (await conn.execute('''
+        select name from app_levels
+        order by force;
+        ''')).fetchall())
 
 
 class AlreadyRegistered(Exception):

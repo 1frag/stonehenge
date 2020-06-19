@@ -5,18 +5,12 @@ from aiohttp import web
 import ssl
 import certifi
 import aiohttp
-import socket
 from typing import NoReturn
 import json
-from urllib.parse import urlencode
-import logging
+from urllib.parse import urlencode, parse_qs
 import uuid
-import aiohttp_session
 
-from stonehenge.users.db_utils import (
-    select_all_users, create_user, AlreadyRegistered, get_user_by_google,
-    remember_user, get_user_by_vk, select_user_by_id,
-)
+from stonehenge.users.db_utils import *
 from stonehenge.type_helper import *
 from stonehenge.constants import *
 
@@ -30,30 +24,37 @@ logger = logging.getLogger('views')
 
 @aiohttp_jinja2.template('index.html')
 async def index(request: 'Request') -> Dict[str, str]:
-    session = await aiohttp_session.get_session(request)
-    user_id = session.get('user_id')
-    async with request.app.db.acquire() as conn:
-        user = await select_user_by_id(conn, user_id)
-    if user is None:
+    if request.user is None:
         raise web.HTTPFound('/login')
-    u_login, mission = user
-    return {'login': u_login, 'mission': mission}
+
+    async with request.app.db.acquire() as conn:
+        data = {'login': request.user.login,
+                'mission': request.user.mission}
+        if request.user.mission == 'teacher':
+            data.update(await prepare_index_page_for_teacher(conn, request.user.id))
+    return data
 
 
 @aiohttp_jinja2.template('login.html')
 async def login(request: 'Request') -> Dict[str, str]:
-    return {}
+    if request.user is None:
+        return {}
+    raise web.HTTPFound('/')
 
 
 @aiohttp_jinja2.template('registration.html')
 async def registration(request: 'Request') -> Dict[str, str]:
-    return {}
+    if request.user is None:
+        return {}
+    raise web.HTTPFound('/')
 
 
 @aiohttp_jinja2.template('reg_next.html')
 async def reg_next(request: 'Request') -> Dict[str, str]:
     logger.info(request.method)
     session = await aiohttp_session.get_session(request)
+    if request.user is not None:
+        raise web.HTTPFound('/')
     if session.get('way_aunt') not in ['custom', 'google', 'vk']:
         logger.debug(f'{session.get("way_aunt")=} so redirect to /registration')
         raise web.HTTPFound('/registration')
@@ -289,3 +290,46 @@ async def callback_by_vk(request: 'Request'):
         logger.warning(f'{e}, {e.__class__}')
 
     return web.HTTPFound('/reg_next')
+
+
+@aiohttp_jinja2.template('create_new_test.html')
+async def create_new_test(request: 'Request'):
+    if request.user and request.user.mission == 'teacher':
+        if request.method == 'GET':
+            async with request.app.db.acquire() as conn:
+                levels = await get_levels(conn)
+            return {'levels': enumerate(levels)}
+        elif request.method == 'POST':
+            clean_data, reason = request.app.test_ctrl.validate(await request.post())
+            if clean_data is None:
+                raise web.HTTPBadRequest(reason=reason)
+            clean_data.update({'author': request.user.id})
+            async with request.app.db.acquire() as conn:
+                test_id = await request.app.test_ctrl.create_new_test(**clean_data, conn=conn)
+
+            # ajax skips 302, and even the statusCode field doesn't prevent
+            # redirection, so I need to do a bad practice, and now I'm
+            # sending 202 instead of 302, the client side should open another
+            # page: / tests / {test_id}, where the test_id will be passed in
+            # the body. This code is not recommended from the RFC, but we
+            # probably need to use the net-ajax method to connect to the server,
+            return web.Response(status=202, body=f'{test_id}')  # so it's hard now
+
+    logger.info('unsuccessful result on page create_new_test by '
+                f'{request.user=}')
+    raise web.HTTPFound('/')
+
+
+async def read_test(request: 'Request'):
+    async with request.app.db.acquire() as conn:
+        test_id = request.match_info.get('test_id')
+        res = await conn.execute('''
+        select * from app_tests
+        where id = %s''', (test_id, ))
+
+        if one := await res.fetchone():
+            return web.Response(body=str(dict(one.items())))
+        raise web.json_response({
+            'error': '???',
+            'test_id': test_id,
+        })

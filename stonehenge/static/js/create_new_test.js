@@ -23,7 +23,6 @@ $(document).ready(function () {
     };
     [1, 2, 3].map(_ => plus.onclick());
     /* end */
-    $("#error-alert").hide();
 });
 
 /* after submit main form */
@@ -37,8 +36,7 @@ function createSubmit() {
             document.location.href = '/tests/' + data;
         },
         error: function (response) {
-            $('#reason-to-fail')[0].innerText = response.statusText;
-            $("#error-alert").fadeIn();
+            make_error(response.statusText)
         },
         processData: false,
         contentType: false,

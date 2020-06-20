@@ -381,4 +381,5 @@ async def exam_test(request: 'Request'):
         test = dict((await (await conn.execute('''select * from app_tests
         where id = %s''', data)).fetchone()).items())
         test['question_bytes'] = base64.encodebytes(test['question_bytes'])
+        test['choice'] = enumerate(test['choice'])
         return {'test': test}

@@ -1,0 +1,16 @@
+{# this file only for macros #}
+{%- macro error_div() -%}
+    <div class="alert alert-danger" id="error-alert">
+        <button type="button" class="close"
+                onclick="$('#error-alert').fadeOut();">x</button>
+        <strong>Error! </strong>
+        <div id="reason-to-fail"></div>
+    </div>
+    <script>
+    function make_error(reason) {
+        $('#reason-to-fail')[0].innerText = reason;
+        $("#error-alert").fadeIn();
+    }
+    $('#error-alert').hide(); // hope this will be after #error-alert
+    </script>
+{%- endmacro %}

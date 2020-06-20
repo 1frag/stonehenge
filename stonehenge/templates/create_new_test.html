@@ -10,12 +10,7 @@
 {% block main %}
 <div class="container">
     <form id="creating-form" onsubmit="createSubmit(this)" method="post">
-        <div class="alert alert-danger" id="error-alert">
-            <button type="button" class="close"
-                    onclick="$('#error-alert').fadeOut();">x</button>
-            <strong>Error! </strong>
-            <div id="reason-to-fail"></div>
-        </div>
+        {{ feachers.error_div() }}
         <div class="col-12 txt-pretty"><br/>
             <h4>Question:</h4>
             <textarea name="question_txt" style="width: 45%" rows=4></textarea><br/>

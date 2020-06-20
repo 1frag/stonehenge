@@ -1,0 +1,37 @@
+:root {
+    --qwidth: 65%;
+}
+
+.btn-choice {
+    background-color: #6da1a333;
+    width: var(--qwidth);
+    padding: 10px;
+    margin-top: 10px;
+}
+
+.btn-choice:hover {
+    background-color: #6da1a396;
+}
+
+.chosen-choice {
+    background-color: #6da1a3E6;
+}
+
+.ok-btn {
+    background-color: #31b084;
+    padding: 10px;
+    width: 150px;
+    margin: 15px calc(100% - var(--qwidth)) 15px 15px;
+}
+
+.chosen-choice:before {
+    content: '\2705';
+}
+
+.ques-pic {
+    max-width: var(--qwidth);
+}
+
+.q-inp {
+    width: var(--qwidth);
+}

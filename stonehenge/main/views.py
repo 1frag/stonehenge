@@ -60,12 +60,28 @@ async def reg_next(request: 'Request') -> Dict[str, str]:
     if session.get('way_aunt') not in ['custom', 'google', 'vk']:
         logger.debug(f'{session.get("way_aunt")=} so redirect to /registration')
         raise web.HTTPFound('/registration')
+    key_pre_auth = session.get('key_pre_auth')
+    try:
+        saving = json.loads((await request.app.redis.get(key_pre_auth)).decode())
+    except (json.JSONDecodeError, TypeError, AttributeError):
+        saving = None
+    logger.info(f'{saving=}')
+    if saving is not None and 'auth' in saving:
+        async with request.app.db.acquire() as conn:
+            f, uid = (get_user_by_vk, saving.get('id_vk_user')) \
+                if saving['auth'] == 'vk' else \
+                (get_user_by_google, saving.get('id_g_user'))
+            try:
+                await remember_user(request, await f(conn, uid))
+                raise web.HTTPFound('/')
+            except TypeError:
+                pass
     return {
         'first_name': session.get('first_name', ''),
         'last_name': session.get('last_name', ''),
         'email': session.get('email', ''),
         'way_aunt': session['way_aunt'],
-        'key_pre_auth': session.get('key_pre_auth'),
+        'key_pre_auth': key_pre_auth,
     }
 
 

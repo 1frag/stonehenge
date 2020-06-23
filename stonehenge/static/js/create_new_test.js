@@ -36,7 +36,7 @@ function createSubmit() {
             document.location.href = '/tests/' + data;
         },
         error: function (response) {
-            make_error(response.statusText)
+            make('error', response.statusText)
         },
         processData: false,
         contentType: false,

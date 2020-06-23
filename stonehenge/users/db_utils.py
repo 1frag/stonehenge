@@ -1,6 +1,6 @@
 from aiopg.sa import SAConnection
 from aiopg.sa.result import RowProxy
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, NamedTuple
 import logging
 import psycopg2
 import psycopg2.errors
@@ -10,17 +10,27 @@ import aiohttp.web
 from stonehenge.type_helper import *
 
 logger = logging.getLogger(__name__)
-UserInformation = namedtuple('User', ['id', 'login', 'mission'])
+
+
+class UserInformation:
+    __slots__ = ('id', 'login', 'mission', 'level')
+    query = '''
+    select u.*, sm.level_id as level from app_users u
+    join app_student_meta sm on u.student_meta_id = sm.id
+    where u.id = %s;
+    '''
+
+    def __init__(self, row_db):
+        for k in self.__slots__:
+            self.__setattr__(k, row_db.get(k))
 
 
 async def select_user_by_id(conn: SAConnection, key: int) -> 'Optional[UserInformation]':
     if key is None:
         return None
-    if res := await (await conn.execute('''
-        select id, login, mission from app_users
-        where id = %s
-    ''', (key,))).fetchone():
-        return UserInformation(*res.as_tuple())  # noqa
+
+    if res := await (await conn.execute(UserInformation.query, (key,))).fetchone():
+        return UserInformation(res)
 
 
 async def select_all_users(conn: SAConnection) -> RowProxy:

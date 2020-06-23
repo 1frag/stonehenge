@@ -15,12 +15,12 @@ class TestController:
     def __init__(self):
         self._reg_for_user_list = re.compile(r'a\d+')
 
-    def _list_from_form(self, data: MultiMapping) -> dict:
-        result = {}
+    def _list_from_form(self, data: MultiMapping) -> list:
+        result = []
         for ai in filter(self._reg_for_user_list.match, data.keys()):
             a_value = data.getone(ai)
             b_value = data.getone('b' + ai[1:], 'off') == 'on'
-            result[a_value] = b_value
+            result.append((a_value, b_value))
         return result
 
     def validate(self, data: MultiMapping) -> Tuple[Optional[Dict], Optional[str]]:
@@ -38,7 +38,7 @@ class TestController:
 
         if data['al'] == 'choice':
             choice = self._list_from_form(data)
-            if len(choice) == 0 or not any(choice.values()):
+            if len(choice) == 0 or sum(x for _, x in choice) == 0:
                 return None, 'choice must be not empty'
             correct, case_ins = None, None
         else:
@@ -88,9 +88,12 @@ class TestController:
             return await res.fetchone()
         except psycopg2.Error as e:
             if psycopg2.errors.lookup(e.pgcode).__name__ == 'RaiseException':
-                if e.pgerror == 'UserMustSetLevel':
+                if 'UserMustSetLevel' in e.pgerror:
                     raise UserMustSetLevel
             raise e
+
+    def check_answer(self, answer, test_id):
+        pass
 
 
 class UserMustSetLevel(Exception):

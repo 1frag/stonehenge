@@ -1,16 +1,44 @@
 {# this file only for macros #}
 {%- macro error_div() -%}
-    <div class="alert alert-danger" id="error-alert">
+    <div class="alert alert-success" id="view-alert"
+         style="display: none">
         <button type="button" class="close"
-                onclick="$('#error-alert').fadeOut();">x</button>
-        <strong>Error! </strong>
+                onclick="$('#view-alert').fadeOut();">
+            x
+        </button>
+        <strong id="mc-what"></strong>
         <div id="reason-to-fail"></div>
     </div>
+    <style>
+        .mc-error-css {
+            color: #a94442;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+        }
+
+        .mc-info-css {
+            color: #31708f;
+            background-color: #d9edf7;
+            border-color: #bce8f1;
+        }
+
+        .mc-success-css {
+            color: #155724;
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+    </style>
     <script>
-    function make_error(reason) {
-        $('#reason-to-fail')[0].innerText = reason;
-        $("#error-alert").fadeIn();
-    }
-    $('#error-alert').hide(); // hope this will be after #error-alert
+        function make(what, reason, title) {
+            let va = $('#view-alert');
+            va.addClass('mc-' + what.toLowerCase() + '-css');
+            $('#mc-what')[0].innerText = title || {
+                'error': 'Ошибка!',
+                'info': 'Info!',
+                'success': 'Успешно!',
+            }[what];
+            $('#reason-to-fail')[0].innerText = reason;
+            va.fadeIn();
+        }
     </script>
 {%- endmacro %}

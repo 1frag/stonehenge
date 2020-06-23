@@ -5,14 +5,14 @@ function ok() {
     let ans = null;
     if (type_ans === 'ch') {
         if (correct.size === 0) {
-            make_error('Choose at least one variant');
+            make('error', 'Choose at least one variant');
             return;
         }
         ans = Array.from(correct);
     } else {
         ans = $('#answer-plain-text')[0].value;
         if (ans.length() === 0) {
-            make_error('Empty answer is not correct answer');
+            make('error', 'Empty answer is not correct answer');
             return;
         }
     }

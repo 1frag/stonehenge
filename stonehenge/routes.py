@@ -36,6 +36,9 @@ def init_routes(app: 'Application') -> None:
     add_route('*', '/sign_out', sign_out, name='sign_out')
     add_route('*', '/finish_registration', finish_registration, name='finish_registration')
 
+    add_route('GET', '/profile', profile_view)
+    add_route('POST', '/profile', profile_save)
+
     add_route('*', '/oauth/google', login_by_google)
     add_route('*', '/oauth/_google', callback_by_google)
 
@@ -45,7 +48,8 @@ def init_routes(app: 'Application') -> None:
     add_route('GET', '/tests/new', create_new_test)
     add_route('POST', '/tests/new', create_new_test)
     add_route('GET', r'/tests/{test_id:\d+}', read_test)
-    add_route('GET', r'/tests/exam', exam_test)
+    add_route('GET', '/tests/exam', exam_test_get)
+    add_route('POST', '/tests/exam', exam_test_post)
 
     # added static dir
     static = PROJECT_PATH / 'static'

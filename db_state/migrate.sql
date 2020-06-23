@@ -24,7 +24,7 @@ create type type_answer as enum ('pt', 'ch');
 
 create table app_student_meta (
     id serial primary key,
-    level_id int references app_levels(id)
+    level_id int references app_levels(id) on delete set null
 );
 
 create table app_users (
@@ -35,15 +35,15 @@ create table app_users (
     email varchar(256) not null,
     mission user_mission not null,
     password varchar(256) null,
-    google_id decimal references app_google_users(google_id),
-    vk_id decimal references app_vk_users(vk_id),
+    google_id decimal references app_google_users(google_id) on delete set null,
+    vk_id decimal references app_vk_users(vk_id) on delete set null,
     auth_type auth_type not null,
-    student_meta_id int references app_student_meta(id)
+    student_meta_id int references app_student_meta(id) on delete set null
 );
 
 create table app_tests (
     id serial primary key,
-    author int references app_users(id),
+    author int references app_users(id) on delete set null,
     created_at timestamp default now(),
     type_answer type_answer not null,
     correct varchar(256),
@@ -55,21 +55,22 @@ create table app_tests (
 
 create table app_marks (
     id serial primary key,
-    solver int references app_users(id),
+    solver int references app_users(id) on delete cascade,
     point float4 not null,
-    test int references app_tests(id)
+    test int references app_tests(id) on delete cascade
 );
 
 create table app_tests_levels (
     id serial primary key,
-    test_id int references app_tests(id),
-    level_id int references app_levels(id),
+    test_id int references app_tests(id) on delete cascade,
+    level_id int references app_levels(id) on delete set null,
     unique (test_id, level_id)
 );
 
 insert into app_levels (name, force)
-values ('elementary', 1), ('A1', 2), ('A2', 3),
-       ('B1', 4), ('B2', 5), ('C1', 6), ('C2', 7);
+values ('beginner', 1), ('elementary', 2), ('pre-intermediate', 3),
+       ('intermediate', 4), ('upper intermediate', 5),
+       ('advanced', 6), ('mastery', 7);
 
 create or replace function
     test_suitable_for_student(student int,
@@ -91,50 +92,6 @@ begin
       and r.level_id = student;
 
     return result;
-end;
-$$ language plpgsql;
-
-create or replace function create_new_user(
-    cur_login varchar(32),
-    cur_email varchar(256),
-    cur_first_name varchar(64),
-    cur_last_name varchar(64),
-    cur_mission user_mission,
-    cur_password varchar(256),
-    google_user int,
-    vk_user int
-) returns bool as
-$$
-declare
-    cur_auth_type auth_type = null;
-    student_meta int = null;
-begin
-    if google_user is not null then
-        insert into app_google_users (google_id)
-        values (google_user);
-        cur_auth_type = 'google'::auth_type;
-    elsif vk_user is not null then
-        insert into app_vk_users (vk_id)
-        values (vk_user);
-        cur_auth_type = 'vk'::auth_type;
-    else
-        raise notice 'Unsupported non-oauth registration';
-    end if;
-
-    if cur_mission = 'student'::user_mission then
-        insert into app_student_meta
-        default values returning id into student_meta;
-    end if;
-
-    insert into app_users (login, first_name, last_name,
-                           email, google_id, vk_id, mission,
-                           auth_type, password, student_meta_id)
-    values (cur_login, cur_first_name, cur_last_name,
-            cur_email, google_user, vk_user, cur_mission,
-            cur_auth_type, cur_password, student_meta)
-    returning id;
-
-    return true;
 end;
 $$ language plpgsql;
 

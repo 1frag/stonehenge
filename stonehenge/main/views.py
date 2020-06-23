@@ -316,6 +316,54 @@ async def callback_by_vk(request: 'Request'):
     return web.HTTPFound('/reg_next')
 
 
+@aiohttp_jinja2.template('profile.html')
+async def profile_view(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPFound('/login')
+
+    async with request.app.db.acquire() as conn:
+        levels = await (
+            await conn.execute('''
+            select name, id=%s as current from app_levels order by force;
+            ''', (request.user.level, ))
+        ).fetchall()  # todo: there something wrong: current not parsed by sqlalchemy
+
+    return {'mission': request.user.mission,
+            'levels': levels}
+
+
+async def profile_save(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPFound('/login')
+
+    try:
+        data = await request.json()
+    except json.JSONDecodeError:
+        raise web.HTTPBadRequest(reason='incorrect json')
+
+    changed = 0
+    logger.debug(data)
+    if 'new_level' in data:
+        changed |= 1
+        async with request.app.db.acquire() as conn:
+            await conn.execute('''
+            with cur_level as (
+                select l.id from app_levels l
+                where name=%s limit 1
+            ), cur_user as (
+                select u.student_meta_id as uid from app_users u
+                where id=%s limit 1
+            )
+            update app_student_meta sm
+            set level_id = cur_level.id
+            from cur_level, cur_user
+            where sm.id=cur_user.uid
+            ''', (data['new_level'], request.user.id))
+
+    logger.debug('%s fileds has been changed', changed)
+    return web.Response(status=200, body=str(changed))
+
+
 @aiohttp_jinja2.template('create_new_test.html')
 async def create_new_test(request: 'Request'):
     if request.user and request.user.mission == 'teacher':
@@ -360,7 +408,7 @@ async def read_test(request: 'Request'):
 
 
 @aiohttp_jinja2.template('exam_test.html')
-async def exam_test(request: 'Request'):
+async def exam_test_get(request: 'Request'):
     if request.user is None or request.user.mission != 'student':
         logger.info(f'{request.user=} tried exam))')
         raise web.HTTPFound('/')
@@ -378,8 +426,32 @@ async def exam_test(request: 'Request'):
             return aiohttp_jinja2.render_template(
                 'error.html', request, {'error': 'there is no tests'}
             )
-        test = dict((await (await conn.execute('''select * from app_tests
-        where id = %s''', data)).fetchone()).items())
-        test['question_bytes'] = base64.encodebytes(test['question_bytes'])
-        test['choice'] = enumerate(test['choice'])
+        test = await (await conn.execute('''
+        select * from app_tests
+        where id = %s''', data)).fetchone()
+        if test is None:
+            raise web.HTTPFound('/?no-more-tests')
+        test = dict(test.items())
+        if test['question_bytes']:
+            test['question_bytes'] = base64.encodebytes(test['question_bytes'])
+        if test['choice']:
+            test['choice'] = enumerate(test['choice'])
         return {'test': test}
+
+
+async def exam_test_post(request: 'Request'):
+    if request.user is None or request.user.mission != 'student':
+        raise web.HTTPForbidden()
+
+    data: dict = await request.json()
+    if not all(map(data.__contains__, ('answer', 'test_id'))):
+        raise web.HTTPBadRequest()
+
+    async with request.app.db.acquire() as conn:
+        res = await (await conn.execute('''
+        select test_suitable_for_student(%s, %s)
+        ''', (request.user.id, data['test_id']))).fetchone()
+        if not res:
+            raise web.HTTPForbidden()
+
+        request.app.test_ctrl.check_answer(data['answer'], data['test_id'])

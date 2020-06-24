@@ -15,7 +15,7 @@ class UserInformation:
     __slots__ = ('id', 'login', 'mission', 'level')
     query = '''
     select u.*, sm.level_id as level from app_users u
-    join app_student_meta sm on u.student_meta_id = sm.id
+    left join app_student_meta sm on u.student_meta_id = sm.id
     where u.id = %s;
     '''
 

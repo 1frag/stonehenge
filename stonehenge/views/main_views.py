@@ -56,6 +56,7 @@ async def reg_next(request: 'Request') -> Dict[str, str]:
     logger.info(request.method)
     session = await aiohttp_session.get_session(request)
     if request.user is not None:
+        logger.debug(f'{request.user=}')
         raise web.HTTPFound('/')
     if session.get('way_aunt') not in ['custom', 'google', 'vk']:
         logger.debug(f'{session.get("way_aunt")=} so redirect to /registration')
@@ -72,7 +73,9 @@ async def reg_next(request: 'Request') -> Dict[str, str]:
                 if saving['auth'] == 'vk' else \
                 (get_user_by_google, saving.get('id_g_user'))
             try:
-                await remember_user(request, await f(conn, uid))
+                user = await f(conn, uid)
+                logger.debug(f'{user=}')
+                await remember_user(request, user)
                 raise web.HTTPFound('/')
             except TypeError:
                 pass

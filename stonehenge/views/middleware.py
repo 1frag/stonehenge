@@ -1,8 +1,11 @@
 from aiohttp import web
 import aiohttp_session
 from typing import Callable, Awaitable
-from stonehenge.users.db_utils import select_user_by_id
-from stonehenge.type_helper import *
+from stonehenge.controllers.ctl_users import select_user_by_id
+from stonehenge.utils.type_helper import *
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @web.middleware

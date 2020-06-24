@@ -1,13 +1,12 @@
 from aiopg.sa import SAConnection
 from aiopg.sa.result import RowProxy
-from typing import Union, Optional, Tuple, NamedTuple
+from typing import Optional
 import logging
 import psycopg2
 import psycopg2.errors
 import aiohttp_session
-import aiohttp.web
 
-from stonehenge.type_helper import *
+from stonehenge.utils.type_helper import *
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +15,7 @@ class UserInformation:
     __slots__ = ('id', 'login', 'mission', 'level')
     query = '''
     select u.*, sm.level_id as level from app_users u
-    join app_student_meta sm on u.student_meta_id = sm.id
+    left join app_student_meta sm on u.student_meta_id = sm.id
     where u.id = %s;
     '''
 

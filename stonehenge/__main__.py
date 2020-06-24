@@ -2,7 +2,7 @@ import asyncio
 import sys
 from aiohttp import web
 
-from stonehenge.app import init_app, database
+from stonehenge.application.app import init_app, database
 
 
 def main() -> None:

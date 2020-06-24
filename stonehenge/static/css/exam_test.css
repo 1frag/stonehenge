@@ -35,3 +35,11 @@
 .q-inp {
     width: var(--qwidth);
 }
+
+.correct {
+    background-color: #31b08466;
+}
+
+.incorrect {
+    background-color: #a9444266;
+}

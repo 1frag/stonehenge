@@ -84,7 +84,7 @@ class TestController:
 
     async def get_next_test(self, user_id: int, conn: SAConnection):
         try:
-            res = await conn.execute('''select get_next_test(%s);''', (user_id, ))
+            res = await conn.execute('''select get_next_test(%s);''', (user_id,))
             return await res.fetchone()
         except psycopg2.Error as e:
             if psycopg2.errors.lookup(e.pgcode).__name__ == 'RaiseException':
@@ -92,9 +92,54 @@ class TestController:
                     raise UserMustSetLevel
             raise e
 
-    def check_answer(self, answer, test_id):
-        pass
+    async def check_answer(self, answer, test_id, conn: SAConnection):
+        res = await (await conn.execute('''
+        select type_answer, choice, correct, case_ins from app_tests where id=%s
+        ''', (test_id,))).fetchone()
+        if res is None:
+            return None
+
+        if res['type_answer'] == 'ch':
+            correct = {i for i, (_, c) in enumerate(res['choice']) if c}
+            answer = set(answer)
+
+            mark = max(+ len(correct & answer)  # правильные
+                       - len(answer - correct)  # лишние
+                       - len(correct - answer), 0)  # нехватающие
+            return {
+                'report': {
+                    'correct': list(correct & answer),
+                    'incorrect': list(correct.symmetric_difference(answer)),
+                },
+                'mark': mark,
+            }
+        else:
+            if res['type_answer'] != 'pt' or not isinstance(answer, str):
+                return None
+            if res['case_ins']:
+                r = answer.lower() == res['correct'].lower()
+            else:
+                r = answer == res['correct']
+            logger.debug('%s %s %s %s', r, answer, res['correct'], res['case_ins'])
+            return {
+                'report': r,
+                'mark': 1 if r else 0,
+            }
+
+    async def set_mark_on_test(self, test_id, user_id, mark, conn: SAConnection):
+        try:
+            await conn.execute('''
+            insert into app_marks (solver, point, test)
+            values (%s, %s, %s);
+            ''', (user_id, mark, test_id))
+        except psycopg2.Error as e:
+            if psycopg2.errors.lookup(e.pgcode).__name__ == 'UniqueViolation':
+                raise UserAlreadyAnswerOnThisTest()
 
 
 class UserMustSetLevel(Exception):
+    pass
+
+
+class UserAlreadyAnswerOnThisTest(Exception):
     pass

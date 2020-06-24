@@ -57,7 +57,8 @@ create table app_marks (
     id serial primary key,
     solver int references app_users(id) on delete cascade,
     point float4 not null,
-    test int references app_tests(id) on delete cascade
+    test int references app_tests(id) on delete cascade,
+    unique (solver, test)
 );
 
 create table app_tests_levels (

@@ -21,15 +21,19 @@
         {% if test['type_answer'] == 'ch' %}
             Choose one or more variant:<br/>
             {% for i, ch in test['choice'] %}
-                <button class="btn btn-choice"
-                onclick="add_ch({{ i }}, this)">{{ ch }}</button>
+                <button class="btn btn-choice" id="ch-btn-{{ i }}"
+                onclick="add_ch({{ i }}, this)">{{ ch[0] }}</button>
             {% endfor %}
         {% else %}
             <input type="text" placeholder="answer" id="answer-plain-text"
                    name="answer" class="input-group-addon q-inp">
         {% endif %}
+    <br/><div style="display: none" id="mark-block">
+        <p style="display: inline-block;">Вы получили за это задание </p>
+        <p style="display: inline-block;" id="how-many-give"></p>
+        <p style="display: inline-block;"> баллов</p></div>
     <br/>
-    <input type="button" onclick="ok()" value="Ok!"
+    <input type="button" onclick="ok()" value="Ok!" id="ok-btn"
            class="btn-info ok-btn float-right">
     </div>
 {% endblock %}

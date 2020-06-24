@@ -7,7 +7,7 @@ import certifi
 import aiohttp
 from typing import NoReturn
 import json
-from urllib.parse import urlencode, parse_qs
+from urllib.parse import urlencode
 import uuid
 import base64
 
@@ -454,4 +454,15 @@ async def exam_test_post(request: 'Request'):
         if not res:
             raise web.HTTPForbidden()
 
-        request.app.test_ctrl.check_answer(data['answer'], data['test_id'])
+        result = await request.app.test_ctrl.check_answer(
+            data['answer'], data['test_id'], conn
+        )
+        if result is None:
+            raise web.HTTPBadRequest()
+        try:
+            await request.app.test_ctrl.set_mark_on_test(
+                data['test_id'], request.user.id, result['mark'], conn,
+            )
+        except UserAlreadyAnswerOnThisTest:
+            raise web.HTTPBadRequest(body='choose other test')
+        return web.json_response(result)

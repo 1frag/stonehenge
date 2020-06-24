@@ -1,13 +1,12 @@
 from aiopg.sa import SAConnection
 from aiopg.sa.result import RowProxy
-from typing import Union, Optional, Tuple, NamedTuple
+from typing import Optional
 import logging
 import psycopg2
 import psycopg2.errors
 import aiohttp_session
-import aiohttp.web
 
-from stonehenge.type_helper import *
+from utils.type_helper import *
 
 logger = logging.getLogger(__name__)
 

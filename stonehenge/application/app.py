@@ -12,11 +12,10 @@ import jinja2
 import asyncio
 import aioredis
 
-from stonehenge.routes import init_routes, init_sessions, init_redis
+from application.routes import init_routes, init_sessions, init_redis
 from stonehenge.utils.common import init_config
-from stonehenge.main.middleware import init_middlewares
+from stonehenge.views.middleware import init_middlewares
 from stonehenge.controllers import TestController
-from stonehenge.constants import *
 
 path = Path(__file__).parent
 db_set = asyncio.Event()
@@ -57,6 +56,11 @@ class Application(web.Application):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.test_ctrl = TestController()
+
+    async def refresh_redis(self):
+        if self.redis is not None:
+            await self.redis.quit()
+        self.redis = await aioredis.create_redis(app['config']['redis'])
 
 
 def init_app(config: Optional[List[str]] = None) -> 'Application':

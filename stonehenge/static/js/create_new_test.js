@@ -25,7 +25,7 @@ $(document).ready(function () {
     /* end */
 });
 
-/* after submit main form */
+/* after submit views form */
 function createSubmit() {
     let formData = new FormData(document.forms['creating-form']);
     $.ajax({

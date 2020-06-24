@@ -1,21 +1,14 @@
-import pathlib
-import os
-
-from aiohttp import web
-import aioredis
-
-import aiohttp_session
 import aiohttp_session.redis_storage
-from aiohttp_session.cookie_storage import EncryptedCookieStorage
 
-from stonehenge.main.views import *
-from stonehenge.type_helper import *
+from stonehenge.views.main_views import *
+from utils.type_helper import *
+from stonehenge.views import admin
 
 PROJECT_PATH = pathlib.Path(__file__).parent
 
 
 async def init_redis(app: 'Application'):
-    app.redis = await aioredis.create_redis(app['config']['redis'])
+    await app.refresh_redis()
     app.redis_installed.set()
 
 
@@ -28,6 +21,8 @@ async def init_sessions(app: 'Application'):
 
 def init_routes(app: 'Application') -> None:
     add_route = app.router.add_route
+
+    add_route('POST', '/__admin__/refresh_redis', admin.refresh_redis)
 
     add_route('*', '/', index, name='index')
     add_route('*', '/login', login, name='login')

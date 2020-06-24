@@ -1,94 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Stonehenge &rarr; регистрация</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
-          crossorigin="anonymous">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous">
-    </script>
-    <script
-            src="https://code.jquery.com/jquery-1.12.4.min.js"
-            integrity="sha256-ZosEbRLbNQzLpnKIkEdrPv7lOy9C27hHQ+Xp8a4MxAQ="
-            crossorigin="anonymous">
-    </script>
-    <script
-            src="https://cdn.jsdelivr.net/npm/jquery.maskedinput@1.4.1/src/jquery.maskedinput.min.js"
-            type="text/javascript">
-    </script>
+{% extends 'base.html' %}
+{% block other_in_head %}
+    <link href="/static/css/reg_next.css" rel="stylesheet">
     <script src="/static/js/node_modules/blueimp-md5/js/md5.js"></script>
-</head>
-<style>
-    html, body, div {
-        margin: 0 auto;
-    }
-
-    body, input {
-        background-color: #1D737366;
-    }
-
-    .forma {
-        border: gray 1px solid;
-        width: 500px;
-        margin-top: 50px;
-        padding: 40px;
-        border-radius: 8px;
-    }
-
-    h1, p, .graceful_color {
-        color: #333333 !important;
-    }
-
-    .header_text {
-        color: darkgray;
-        text-align: center;
-        font-family: "Droid Serif", "DejaVu Serif", "STIX", serif;
-    }
-
-    .custom-btn {
-        width: 175px;
-        margin-top: 6px;
-        padding: 10px;
-        background-color: #009999;
-        border-radius: 8px;
-        margin-left: 20px;
-    }
-
-    .cus_inp {
-        margin-left: 20px;
-        margin-top: -10px;
-        width: 350px;
-    }
-
-    .user-mission {
-        font-size: 20px;
-        list-style-type: none;
-        margin-left: 30px;
-        padding: 0;
-    }
-
-    .user-mission li {
-        float: left;
-        margin: 0 5px 0 0;
-    }
-
-    .user-mission label {
-        padding: 5px;
-        border: 1px solid #33CCCC33;
-        cursor: pointer;
-    }
-
-    .user-mission label:hover {
-        background: #33CCCC33;
-    }
-</style>
-<body><br/>
+{% endblock %}
+{% block title %}
+    Start page
+{% endblock %}
+{% block navbar %}{% endblock %}
+{% block main %}
+<br/>
 <h1 class="header_text">
     STONEHENGE
 </h1>
@@ -157,6 +77,4 @@
         </div>
     </div>
 </form>
-
-</body>
-</html>
+{% endblock %}

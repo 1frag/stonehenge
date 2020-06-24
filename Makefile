@@ -24,3 +24,6 @@ runall:
 
 restart_app:
 	docker-compose restart stonehenge_app
+
+follow-local-logs:
+	docker-compose logs --tail=20 -f stonehenge_app

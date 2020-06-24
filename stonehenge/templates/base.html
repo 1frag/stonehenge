@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {% block head %}
+        <meta charset="UTF-8">
+        <meta
+                name="viewport"
+                content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
+        >
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+              integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+              crossorigin="anonymous">
+        <link rel="icon" href="{{ url('static', filename='images/favicon.ico') }}">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+                integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+                crossorigin="anonymous"></script>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
+              rel="stylesheet"/>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
+        <script src="/static/js/base_script.js"></script>
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
+              rel="stylesheet"/>
+    {% endblock %}
+    {% block other_in_head %}{% endblock %}
+
+    <title>{% block title %}{% endblock %} - Stonehenge</title>
+</head>
+<body>
+{% import 'feachers.html' as feachers %}
+{% block navbar %}
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-light bg-custom">
+            <a class="navbar-brand" href="#">Stonehenge</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
+                    aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
+                <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/">Home <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link txt_nav_bar" href="/profile">Profile</a>
+                    </li>
+                    <li>
+                        <a class="nav-link txt_nav_bar" href="/settings">Settings</a>
+                    </li>
+                    <li>
+                        <a class="nav-link txt_nav_bar" onclick="signOut()">Sign out</a>
+                    </li>
+                    <li class="hi_text txt_nav_bar">
+                        Welcome, {{ login }} ({{ mission }})
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block main %}{% endblock %}
+
+{% block footer %}
+    <div class="container">
+        <div style="position: absolute; bottom: 10px; left: 45%">
+            <footer class="page-footer font-small blue">
+                <div class="footer-copyright text-center py-3">© 2020 No copyright:
+                    <a href="http://localhost:8080/"> http://localhost:8080/</a>
+                </div>
+            </footer>
+        </div>
+    </div>
+{% endblock %}
+
+</body>
+</html>

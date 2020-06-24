@@ -1,0 +1,48 @@
+html, body, div {
+    margin: 0 auto;
+}
+
+body, input {
+    background-color: #1D737366;
+}
+
+.forma {
+    border: gray 1px solid;
+    width: 500px;
+    margin-top: 50px;
+    padding: 40px;
+    border-radius: 8px;
+}
+
+h1, p, .graceful_color {
+    color: #333333 !important;
+}
+
+.header_text {
+    color: darkgray;
+    text-align: center;
+    font-family: "Droid Serif", "DejaVu Serif", "STIX", serif;
+}
+
+.custom-btn {
+    width: 350px;
+    margin-top: 6px;
+    padding: 10px;
+    background-color: #009999;
+    border-radius: 8px;
+    margin-left: 20px;
+}
+
+.oauth_block {
+    border: 1px darkgray solid;
+    padding: 10px;
+    border-radius: 8px;
+    width: 350px;
+    background-color: #33CCCC33;
+}
+
+.cus_inp {
+    margin-left: 20px;
+    margin-top: -10px;
+    width: 350px;
+}

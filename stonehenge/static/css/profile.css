@@ -1,0 +1,11 @@
+:root {
+    --qwidth: 140px;
+}
+
+.save-btn {
+    background-color: #31b08496;
+    padding: 7px;
+    width: var(--qwidth);
+    border: none;
+    margin-top: 15px;
+}

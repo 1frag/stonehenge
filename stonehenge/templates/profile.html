@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block other_in_head %}
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <link href="/static/css/profile.css" rel="stylesheet">
+    <script src="/static/js/profile.js"></script>
+{% endblock %}
+{% block title %}
+    Profile
+{% endblock %}
+{% block main %}
+    <div class="container">{{ feachers.error_div() }}
+        <div class="col-5"><br/>
+        <h3>Настройте свой профиль</h3><br/>
+        {% if mission == 'student' %}
+            <form>
+            <label for="level">Выбирите свой уровень.</label>
+            <select class="form-control" id="level">
+                {% for l in levels %}
+                current = {{ l['current'] }}
+                    <option {{ 'selected' if l[1] else '' }}>
+                        {{ l['name'] }}
+                    </option>
+                {% endfor %}
+            </select>
+            <input type="button" value="Сохранить" class="float-right save-btn"
+            onclick="saveProfile()">
+            </form>
+        {% endif %}
+    </div></div>
+{% endblock %}

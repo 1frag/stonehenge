@@ -4,6 +4,9 @@ from aiohttp import web
 from aiopg.sa import SAConnection
 from typing import Optional, Tuple, Dict, Union
 from multidict import MultiMapping
+import psycopg2
+import psycopg2.errors
+import json
 
 logger = logging.getLogger(__name__)
 
@@ -12,12 +15,12 @@ class TestController:
     def __init__(self):
         self._reg_for_user_list = re.compile(r'a\d+')
 
-    def _list_from_form(self, data: MultiMapping) -> dict:
-        result = {}
+    def _list_from_form(self, data: MultiMapping) -> list:
+        result = []
         for ai in filter(self._reg_for_user_list.match, data.keys()):
             a_value = data.getone(ai)
             b_value = data.getone('b' + ai[1:], 'off') == 'on'
-            result[a_value] = b_value
+            result.append((a_value, b_value))
         return result
 
     def validate(self, data: MultiMapping) -> Tuple[Optional[Dict], Optional[str]]:
@@ -35,7 +38,7 @@ class TestController:
 
         if data['al'] == 'choice':
             choice = self._list_from_form(data)
-            if len(choice) == 0 or not any(choice.values()):
+            if len(choice) == 0 or sum(x for _, x in choice) == 0:
                 return None, 'choice must be not empty'
             correct, case_ins = None, None
         else:
@@ -61,6 +64,8 @@ class TestController:
             file_bytes = question_bytes.file.read()
         else:
             file_bytes = question_bytes
+        if choice is not None:
+            choice = json.dumps(choice)
 
         test_id = (await (await conn.execute('''
             insert into app_tests (author, type_answer, correct, choice,
@@ -76,3 +81,65 @@ class TestController:
             returning id;
         ''', (test_id, levels))).fetchall()
         return test_id
+
+    async def get_next_test(self, user_id: int, conn: SAConnection):
+        try:
+            res = await conn.execute('''select get_next_test(%s);''', (user_id,))
+            return await res.fetchone()
+        except psycopg2.Error as e:
+            if psycopg2.errors.lookup(e.pgcode).__name__ == 'RaiseException':
+                if 'UserMustSetLevel' in e.pgerror:
+                    raise UserMustSetLevel
+            raise e
+
+    async def check_answer(self, answer, test_id, conn: SAConnection):
+        res = await (await conn.execute('''
+        select type_answer, choice, correct, case_ins from app_tests where id=%s
+        ''', (test_id,))).fetchone()
+        if res is None:
+            return None
+
+        if res['type_answer'] == 'ch':
+            correct = {i for i, (_, c) in enumerate(res['choice']) if c}
+            answer = set(answer)
+
+            mark = max(+ len(correct & answer)  # правильные
+                       - len(answer - correct)  # лишние
+                       - len(correct - answer), 0)  # нехватающие
+            return {
+                'report': {
+                    'correct': list(correct & answer),
+                    'incorrect': list(correct.symmetric_difference(answer)),
+                },
+                'mark': mark,
+            }
+        else:
+            if res['type_answer'] != 'pt' or not isinstance(answer, str):
+                return None
+            if res['case_ins']:
+                r = answer.lower() == res['correct'].lower()
+            else:
+                r = answer == res['correct']
+            logger.debug('%s %s %s %s', r, answer, res['correct'], res['case_ins'])
+            return {
+                'report': r,
+                'mark': 1 if r else 0,
+            }
+
+    async def set_mark_on_test(self, test_id, user_id, mark, conn: SAConnection):
+        try:
+            await conn.execute('''
+            insert into app_marks (solver, point, test)
+            values (%s, %s, %s);
+            ''', (user_id, mark, test_id))
+        except psycopg2.Error as e:
+            if psycopg2.errors.lookup(e.pgcode).__name__ == 'UniqueViolation':
+                raise UserAlreadyAnswerOnThisTest()
+
+
+class UserMustSetLevel(Exception):
+    pass
+
+
+class UserAlreadyAnswerOnThisTest(Exception):
+    pass

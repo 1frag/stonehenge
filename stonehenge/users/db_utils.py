@@ -1,6 +1,6 @@
 from aiopg.sa import SAConnection
 from aiopg.sa.result import RowProxy
-from typing import Union, Optional, Tuple
+from typing import Union, Optional, Tuple, NamedTuple
 import logging
 import psycopg2
 import psycopg2.errors
@@ -10,17 +10,27 @@ import aiohttp.web
 from stonehenge.type_helper import *
 
 logger = logging.getLogger(__name__)
-UserInformation = namedtuple('User', ['id', 'login', 'mission'])
+
+
+class UserInformation:
+    __slots__ = ('id', 'login', 'mission', 'level')
+    query = '''
+    select u.*, sm.level_id as level from app_users u
+    join app_student_meta sm on u.student_meta_id = sm.id
+    where u.id = %s;
+    '''
+
+    def __init__(self, row_db):
+        for k in self.__slots__:
+            self.__setattr__(k, row_db.get(k))
 
 
 async def select_user_by_id(conn: SAConnection, key: int) -> 'Optional[UserInformation]':
     if key is None:
         return None
-    if res := await (await conn.execute('''
-        select id, login, mission from app_users
-        where id = %s
-    ''', (key,))).fetchone():
-        return UserInformation(*res.as_tuple())  # noqa
+
+    if res := await (await conn.execute(UserInformation.query, (key,))).fetchone():
+        return UserInformation(res)
 
 
 async def select_all_users(conn: SAConnection) -> RowProxy:
@@ -56,26 +66,18 @@ async def create_user(
         trans = None
         try:
             trans = await conn.begin()  # type: Optional[RootTransaction]
-            if google_user:
-                res = await conn.execute('''
-                insert into app_google_users (google_id)
-                values (%s);
-                insert into app_users (login, first_name, last_name, email, google_id,
-                mission, auth_type)
-                values (%s, %s, %s, %s, %s, %s, 'google')
-                returning id;
-                ''', google_user, login, first_name, last_name, email,
-                                         google_user, mission)  # type: ResultProxy
-            else:
-                res = await conn.execute('''
-                insert into app_vk_users (vk_id)
-                values (%s);
-                insert into app_users (login, first_name, last_name, email, vk_id,
-                mission, auth_type)
-                values (%s, %s, %s, %s, %s, %s, 'vk')
-                returning id;
-                ''', vk_user, login, first_name, last_name, email,
-                                         vk_user, mission)  # type: ResultProxy
+            res = await conn.execute('''
+            select create_new_user(
+                %s, -- cur_login
+                %s, -- cur_email
+                %s, -- cur_first_name
+                %s, -- cur_last_name
+                %s, -- cur_mission
+                %s, -- cur_password
+                %s, -- google_user
+                %s -- vk_user
+            );''', (login, email, first_name, last_name, mission,
+                    password, google_user, vk_user))  # type: ResultProxy
             ret_id = await res.fetchone()  # type: RowProxy
             await trans.commit()
             return ret_id[0]

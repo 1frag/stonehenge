@@ -1,58 +1,13 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta
-            name="viewport"
-            content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"
-    >
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-    <link rel="icon" href="{{ url('static', filename='images/favicon.ico') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
-            integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
-            crossorigin="anonymous"></script>
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css"
-          rel="stylesheet"/>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/js/bootstrap.min.js"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-beta/css/bootstrap.min.css"
-          rel="stylesheet"/>
+{% extends 'base.html' %}
+{% block other_in_head %}
     <link href="/static/css/style_index.css" rel="stylesheet">
     <script src="/static/js/script_index.js"></script>
-
-    <title>Start page</title>
-</head>
-<body>
+{% endblock %}
+{% block title %}
+    Start page
+{% endblock %}
+{% block main %}
 <div class="container">
-    <nav class="navbar navbar-expand-lg navbar-light bg-custom">
-        <a class="navbar-brand" href="#">Stonehenge</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo02"
-                aria-controls="navbarTogglerDemo02" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-
-        <div class="collapse navbar-collapse" id="navbarTogglerDemo02">
-            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link txt_nav_bar" href="#">Profile</a>
-                </li>
-                <li>
-                    <a class="nav-link txt_nav_bar" href="#">Settings</a>
-                </li>
-                <li>
-                    <a class="nav-link txt_nav_bar" href="#">Sign out</a>
-                </li>
-                <li class="hi_text txt_nav_bar">
-                    Welcome, {{ login }} ({{ mission }})
-                </li>
-            </ul>
-        </div>
-    </nav>
-
     <div class="col-12">
         {% if mission == 'teacher' %}
             <div class="card custom-card my-btn">
@@ -62,9 +17,9 @@
                     <p class="card-text">Here you can create new test
                         and follow their statistics</p>
                     <p>{{ created_tests }} tests created
-                        <a href="/tests/new">(создать новый)</a></p>
+                        <a href="/tests/new">(create new)</a></p>
                     <p>{{ sol_received }} solutions received
-                        <a href="/tests/">(смотреть статистику)</a></p>
+                        <a href="/tests/">(see stats)</a></p>
                 </div>
             </div>
             <div class="card custom-card my-btn">
@@ -90,20 +45,44 @@
                         and add tasks</p>
                 </div>
             </div>
-        {% endif %}
-    </div>
-
-{#    <div class="col-8 float-right main-console" id="console">#}
-{#        <div id="inc"></div>#}
-{#    </div>#}
-
-    <div style="position: absolute; bottom: 10px; left: 45%">
-        <footer class="page-footer font-small blue">
-            <div class="footer-copyright text-center py-3">© 2020 No copyright:
-                <a href="http://localhost:8080/"> http://localhost:8080/</a>
+        {% elif mission == 'student' %}
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#" onclick="tests()">Tests</a></h5>
+                    <p class="card-text">Here you can pass tests
+                        and follow their statistics</p>
+                    <p>{{ created_tests }} tests created
+                        <a href="/tests/exam">(start testing)</a></p>
+                    <p>{{ sol_received }} solutions received
+                        <a href="/tests/stats">(see stats)</a></p>
+                </div>
             </div>
-        </footer>
-    </div>
+            {# todo: other block don't follow real description #}
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d9945066">
+                    <h5 class="card-title"><a href="#">Training videos</a></h5>
+                    <p class="card-text">Here you can upload training
+                        videos and follow their statistics</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d1bd4766">
+                    <h5 class="card-title"><a href="#">Video calls with students</a></h5>
+                    <p class="card-text">Here you can call students or find them</p>
+                </div>
+            </div>
+            <div class="card custom-card my-btn">
+                <div class="card-body custom-card-body radius-able"
+                     style="background-color: #d9945066">
+                    <h5 class="card-title"><a href="#">Writing</a></h5>
+                    <p class="card-text">Here you can check student work
+                        and add tasks</p>
+                </div>
+            </div>
+        {% endif %}
 
-</body>
-</html>
+    </div>
+{% endblock %}

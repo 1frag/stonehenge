@@ -1,7 +1,7 @@
 import aiohttp_session.redis_storage
 
 from stonehenge.views.main_views import *
-from utils.type_helper import *
+from stonehenge.utils.type_helper import *
 from stonehenge.views import admin
 
 PROJECT_PATH = pathlib.Path(__file__).parent
@@ -47,7 +47,7 @@ def init_routes(app: 'Application') -> None:
     add_route('POST', '/tests/exam', exam_test_post)
 
     # added static dir
-    static = PROJECT_PATH / 'static'
+    static = PROJECT_PATH / '..' / 'static'
     app.router.add_static(
         '/static/', static, name='static',
     )

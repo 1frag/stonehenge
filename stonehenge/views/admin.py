@@ -1,6 +1,6 @@
 from aiohttp import web
 import os
-from utils.type_helper import *
+from stonehenge.utils.type_helper import *
 
 
 async def refresh_redis(request: 'Request'):

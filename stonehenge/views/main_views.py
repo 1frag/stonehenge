@@ -11,9 +11,9 @@ from urllib.parse import urlencode
 import uuid
 import base64
 
-from controllers.ctl_users import *
-from utils.type_helper import *
-from utils.constants import *
+from stonehenge.controllers.ctl_users import *
+from stonehenge.utils.type_helper import *
+from stonehenge.utils.constants import *
 from stonehenge.controllers import *
 
 logging.basicConfig(

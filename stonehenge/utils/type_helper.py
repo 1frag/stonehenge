@@ -6,8 +6,8 @@ if TYPE_CHECKING:
     import aiohttp.web
     import aiopg.sa.engine
 
-    from application.app import Application
-    from controllers.ctl_users import UserInformation
+    from stonehenge.application.app import Application
+    from stonehenge.controllers.ctl_users import UserInformation
 
     RowsProxy = List[aiopg.sa.result.RowProxy]
     ResultProxy = aiopg.sa.result.ResultProxy

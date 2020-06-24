@@ -27,3 +27,6 @@ restart_app:
 
 follow-local-logs:
 	docker-compose logs --tail=20 -f stonehenge_app
+
+docker-bash:
+	docker-compose run --rm stonehenge_app /bin/bash

@@ -6,7 +6,7 @@ import psycopg2
 import psycopg2.errors
 import aiohttp_session
 
-from utils.type_helper import *
+from stonehenge.utils.type_helper import *
 
 logger = logging.getLogger(__name__)
 

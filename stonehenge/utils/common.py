@@ -1,10 +1,17 @@
 import os
 import pathlib
-import socket
+import logging
 
 from aiohttp import web
 
+from stonehenge.utils.constants import HOST
+
 PATH = pathlib.Path(__file__).parent.parent.parent
+logging.basicConfig(
+    level='DEBUG',
+    format='%(levelname)s: [%(name)s at %(lineno)d] %(message)s',
+)
+logging.getLogger('parso.python.diff').disabled = True
 
 
 def get_db_url(test=False, readable=False):
@@ -29,7 +36,7 @@ def get_db_url(test=False, readable=False):
 def get_config(test=False, readable=False):
     options = {
         'app': {
-            'host': os.getenv('HOST', '0.0.0.0'),
+            'host': HOST,
             'port': os.getenv('PORT', 8080),
             'domain': os.getenv('DOMAIN', 'http://localhost:8080'),
         },
@@ -38,10 +45,14 @@ def get_config(test=False, readable=False):
             'password': os.getenv('ADMIN_PASSWORD', 'admin'),
         },
         'postgres': get_db_url(test, readable),
-        'redis': os.getenv('REDIS_URL', 'redis://:redis@redis/')
+        'redis': os.getenv('REDIS_URL', 'redis://:redis@redis/'),
     }
     return options
 
 
 def init_config(app: web.Application) -> None:
     app['config'] = get_config()
+
+
+def get_logger(name):
+    return logging.getLogger(name)

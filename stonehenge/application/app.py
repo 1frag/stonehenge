@@ -52,10 +52,13 @@ class Application(web.Application):
     db: aiopg.sa.engine.Engine
     redis_installed = asyncio.Event()
     sessions_installed = asyncio.Event()
+    test_ctrl: TestController
+    video_ctrl: VideoController
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.test_ctrl = TestController()
+        self.video_ctrl = VideoController()
 
     async def refresh_redis(self):
         if self.redis is not None:

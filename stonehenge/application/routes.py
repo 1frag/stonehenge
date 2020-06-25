@@ -1,8 +1,8 @@
 import aiohttp_session.redis_storage
+import pathlib
 
-from stonehenge.views.main_views import *
+from stonehenge import views
 from stonehenge.utils.type_helper import *
-from stonehenge.views import admin
 
 PROJECT_PATH = pathlib.Path(__file__).parent
 
@@ -22,30 +22,33 @@ async def init_sessions(app: 'Application'):
 def init_routes(app: 'Application') -> None:
     add_route = app.router.add_route
 
-    add_route('POST', '/__admin__/refresh_redis', admin.refresh_redis)
+    add_route('POST', '/__admin__/refresh_redis', views.admin.refresh_redis)
 
-    add_route('*', '/', index, name='index')
-    add_route('*', '/login', login, name='login')
-    add_route('*', '/registration', registration, name='registration')
-    add_route('*', '/reg_next', reg_next, name='reg_next')
-    add_route('*', '/sign_out', sign_out, name='sign_out')
-    add_route('*', '/finish_registration', finish_registration, name='finish_registration')
+    add_route('*', '/', views.basic.index)
+    add_route('GET', '/profile', views.basic.profile_view)
+    add_route('POST', '/profile', views.basic.profile_save)
 
-    add_route('GET', '/profile', profile_view)
-    add_route('POST', '/profile', profile_save)
+    add_route('*', '/login', views.auth.login)
+    add_route('*', '/registration', views.auth.registration)
+    add_route('*', '/reg_next', views.auth.reg_next)
+    add_route('*', '/sign_out', views.auth.sign_out)
+    add_route('*', '/finish_registration', views.auth.finish_registration)
 
-    add_route('*', '/oauth/google', login_by_google)
-    add_route('*', '/oauth/_google', callback_by_google)
+    add_route('*', '/oauth/google', views.auth.login_by_google)
+    add_route('*', '/oauth/_google', views.auth.callback_by_google)
 
-    add_route('*', '/oauth/vk', login_by_vk)
-    add_route('*', '/oauth/_vk', callback_by_vk)
+    add_route('*', '/oauth/vk', views.auth.login_by_vk)
+    add_route('*', '/oauth/_vk', views.auth.callback_by_vk)
 
-    add_route('GET', '/tests/new', create_new_test)
-    add_route('POST', '/tests/new', create_new_test)
-    add_route('GET', r'/tests/{test_id:\d+}', read_test)
-    add_route('GET', '/tests/exam', exam_test_get)
-    add_route('POST', '/tests/exam', exam_test_post)
-    add_route('GET', '/tests/stats', exam_stats)
+    add_route('GET', '/tests/new', views.exam.create_new_test)
+    add_route('POST', '/tests/new', views.exam.create_new_test)
+    add_route('GET', r'/tests/{test_id:\d+}', views.exam.read_test)
+    add_route('GET', '/tests/exam', views.exam.exam_test_get)
+    add_route('POST', '/tests/exam', views.exam.exam_test_post)
+    add_route('GET', '/tests/stats', views.exam.exam_stats)
+
+    add_route('GET', '/video/new', views.video.new_video_get)
+    add_route('POST', '/video/new', views.video.new_video_post)
 
     # added static dir
     static = PROJECT_PATH / '..' / 'static'

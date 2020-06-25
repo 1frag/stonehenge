@@ -33,7 +33,7 @@ li {
 
 .custom-card-body {
     background-color: #64A1CE40;
-    height: 200px;
+    min-height: 222px;
 }
 
 .radius-able {

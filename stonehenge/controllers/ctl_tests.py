@@ -93,6 +93,13 @@ class TestController:
                     raise UserMustSetLevel
             raise e
 
+    @staticmethod
+    def choice_to_str(choice, answer=None):
+        if answer is None:
+            return ' / '.join([x[0] for x in choice if x[1]])
+        else:
+            return ' / '.join([choice[i][0] for i in answer])
+
     async def check_answer(self, answer, test_id, conn: SAConnection):
         res = await (await conn.execute('''
         select type_answer, choice, correct, case_ins from app_tests where id=%s
@@ -101,7 +108,8 @@ class TestController:
             return None
 
         if res['type_answer'] == 'ch':
-            correct = {i for i, (_, c) in enumerate(res['choice']) if c}
+            choice = res['choice']
+            correct = {i for i, (_, c) in enumerate(choice) if c}
             answer = set(answer)
 
             mark = max(+ len(correct & answer)  # правильные
@@ -113,6 +121,7 @@ class TestController:
                     'incorrect': list(correct.symmetric_difference(answer)),
                 },
                 'mark': int(100 * mark / len(correct)),
+                'answer': self.choice_to_str(choice, answer),
             }
         else:
             if res['type_answer'] != 'pt' or not isinstance(answer, str):
@@ -125,14 +134,15 @@ class TestController:
             return {
                 'report': r,
                 'mark': 100 if r else 0,
+                'answer': answer,
             }
 
-    async def set_mark_on_test(self, test_id, user_id, mark, conn: SAConnection):
+    async def set_mark_on_test(self, test_id, user_id, mark, answer, conn: SAConnection):
         try:
             await conn.execute('''
-            insert into app_marks (solver, point, test)
-            values (%s, %s, %s);
-            ''', (user_id, mark, test_id))
+            insert into app_marks (solver, point, test, answer)
+            values (%s, %s, %s, %s);
+            ''', (user_id, mark, test_id, answer))
         except psycopg2.Error as e:
             if psycopg2.errors.lookup(e.pgcode).__name__ == 'UniqueViolation':
                 raise UserAlreadyAnswerOnThisTest()
@@ -158,14 +168,24 @@ class TestController:
                 group by m.test, t.id;
             ''', (user_id,))).fetchall())
 
-    @staticmethod
-    def precalc_test_before_show(test):
+    def precalc_test_before_show(self, test, choice_to_str=False):
         test = dict(test.items())
         if test['question_bytes']:
             test['question_bytes'] = base64.encodebytes(test['question_bytes'])
         if test['choice']:
+            if choice_to_str:
+                test['correct'] = self.choice_to_str(test['choice'])
             test['choice'] = enumerate(test['choice'])
         return test
+
+    async def get_test_stat_for_student(self, user_id, conn: SAConnection):
+        res = self.make_title_for_each_row(
+            await (await conn.execute('''
+            select t.*, m.point from app_marks m
+            join app_tests t on m.test = t.id
+            where m.solver=%s;
+        ''', (user_id,))).fetchall())
+        return res
 
 
 class UserMustSetLevel(Exception):

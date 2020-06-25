@@ -58,6 +58,7 @@ create table app_marks (
     solver int references app_users(id) on delete cascade,
     point float4 not null,
     test int references app_tests(id) on delete cascade,
+    answer text,
     unique (solver, test)
 );
 
@@ -165,16 +166,5 @@ begin
     order by t.id limit 1;
 
     return result;
-end;
-$$ language plpgsql;
-
-create or replace function get_count_of_solution_on_test(
-    test_id int
-) returns int as $$
-declare
-    res int;
-begin
-    select count(*) into res from app_marks where test=test_id;
-    return res;
 end;
 $$ language plpgsql;

@@ -400,13 +400,16 @@ async def read_test(request: 'Request'):
     async with request.app.db.acquire() as conn:
         test_id = request.match_info.get('test_id')
         test = await (await conn.execute('''
-        select * from app_tests
-        where id = %s''', (test_id,))).fetchone()
+        select t.*, m.point, m.answer from app_tests t
+        left join app_marks m on t.id = m.test
+        where t.id = %s''', (test_id,))).fetchone()
 
         if test is None:
             raise web.HTTPNotFound()
 
-        test = request.app.test_ctrl.precalc_test_before_show(test)
+        test = request.app.test_ctrl.precalc_test_before_show(
+            test, choice_to_str=True
+        )
         return {
             'test': test,
             **request.to_jinja,
@@ -464,7 +467,8 @@ async def exam_test_post(request: 'Request'):
             raise web.HTTPBadRequest()
         try:
             await request.app.test_ctrl.set_mark_on_test(
-                data['test_id'], request.user.id, result['mark'], conn,
+                data['test_id'], request.user.id, result['mark'],
+                result['answer'], conn,
             )
         except UserAlreadyAnswerOnThisTest:
             raise web.HTTPBadRequest(body='choose other test')
@@ -485,7 +489,9 @@ async def exam_stats(request: 'Request'):
             return {'res': res, **request.to_jinja}
 
         elif request.user.mission == 'student':
-            res = await (await conn.execute('''
-            select * from app_marks where solver=%s
-            ''', (request.user.id,))).fetchall()
-            return res
+            res = await request.app.test_ctrl.get_test_stat_for_student(
+                request.user.id, conn,
+            )
+            if res is None:
+                raise web.HTTPNotFound()
+            return {'res': res, **request.to_jinja}

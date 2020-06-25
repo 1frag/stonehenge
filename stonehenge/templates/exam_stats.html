@@ -10,9 +10,9 @@
 {% endblock %}
 {% block main %}
     <div class="container"><br/>
-        {% if mission == 'teacher' %}
-            <table class="table">
-                <thead>
+        <table class="table">
+            <thead>
+            {% if mission == 'teacher' %}
                 <tr>
                     <th scope="col">Вопрос</th>
                     <th scope="col">Количество решений</th>
@@ -33,8 +33,26 @@
                         </a></td>
                     </tr>
                 {% endfor %}
-                </tbody>
-            </table>
-        {% endif %}
+
+            {% elif mission == 'student' %}
+                <tr>
+                    <th scope="col">Вопрос</th>
+                    <th scope="col">Получено</th>
+                    <th scope="col"></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for row in res %}
+                    <tr>
+                        <th scope="row">{{ row['title'] }}</th>
+                        <td>{{ row['point'] }}%</td>
+                        <td><a href="/tests/{{ row['id'] }}">
+                            К тесту
+                        </a></td>
+                    </tr>
+                {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

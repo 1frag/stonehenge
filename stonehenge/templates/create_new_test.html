@@ -49,11 +49,7 @@
                 <div id="ca-plus-ans" class="btn-info my-btn">+</div>
             </div>
             <br/>
-            <h4>Level:</h4>
-            {% for i, l in levels %}
-                <input type="checkbox" id="l{{ i }}" name="levels" value="{{ l['name'] }}">
-                <label for="l{{ i }}">{{ l['name'] }}</label><br/>
-            {% endfor %}
+            {{ feachers.levels_for_form(levels) }}
             <input type="button" value="Submit" class="btn"
                    style="margin: 30px; padding: 15px; background-color: #33333344" onclick="createSubmit()">
         </div>

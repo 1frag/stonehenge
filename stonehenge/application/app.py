@@ -10,12 +10,14 @@ import aiopg.sa
 from aiohttp import web
 import jinja2
 import asyncio
+import aiohttp.client
 import aioredis
 
 from stonehenge.application.routes import init_routes, init_sessions, init_redis
 from stonehenge.utils.common import init_config
 from stonehenge.views.middleware import init_middlewares
-from stonehenge.controllers import TestController
+from stonehenge.controllers import TestController, VideoController
+from stonehenge.utils.constants import *
 
 path = Path(__file__).parent.parent
 db_set = asyncio.Event()

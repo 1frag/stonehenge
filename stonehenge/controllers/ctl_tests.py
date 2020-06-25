@@ -55,12 +55,12 @@ class TestController:
                 'question_bytes': data.getone('question_file', b''),
                 'levels': data.getall('levels')}, None
 
+    @staticmethod
     async def create_new_test(
-            self, type_answer, correct, case_ins, choice,
+            type_answer, correct, case_ins, choice,
             question_txt, question_bytes: Union[web.FileField, bytes],
             levels, author, conn: SAConnection,
     ):
-
         if isinstance(question_bytes, web.FileField):
             file_bytes = question_bytes.file.read()
         else:

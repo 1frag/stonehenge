@@ -131,7 +131,7 @@ async def prepare_index_page_for_teacher(conn: SAConnection, user_id: int):
     }
 
 
-async def get_levels(conn: SAConnection):
+async def get_levels(conn: SAConnection):  # todo: transport to other file
     return list(await (await conn.execute('''
         select name from app_levels
         order by force;

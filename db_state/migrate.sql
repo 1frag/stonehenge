@@ -168,3 +168,18 @@ begin
     return result;
 end;
 $$ language plpgsql;
+
+create table app_video (
+    id serial primary key,
+    cloud_path text not null, -- disk:/stonehenge/...
+    cloud_href text not null, -- https://cloud.../...
+    title varchar(128) not null,
+    description text
+);
+
+create table app_video_levels (
+    id serial primary key,
+    video_id int references app_video(id) on delete cascade,
+    level_id int references app_levels(id) on delete set null,
+    unique (video_id, level_id)
+);

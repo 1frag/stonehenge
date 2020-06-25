@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block other_in_head %}
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <link href="/static/css/favorite.css" rel="stylesheet">
+    <script src="/static/js/new_video.js"></script>
+{% endblock %}
+{% block title %}
+    New video
+{% endblock %}
+{% block main %}
+    <div class="container"><br/>
+        {{ feachers.error_div() }}
+        <form id="new-video-form">
+            <label for="title">Введите название:</label>
+            <input type="text" required name="title" id="title"
+                   class="form-control">
+            <label for="description">
+                Дополнительный текстовый материал:
+            </label>
+            <textarea id="description" class="form-control" name="description"></textarea>
+            <input type="file" class="form-control-file" id="video_file" required>
+            {{ feachers.levels_for_form(levels) }}
+            <input type="button" class="btn btn-primary mb-2" value="Добавить"
+            onclick="ok_btn()">
+        </form>
+    </div>
+{% endblock %}

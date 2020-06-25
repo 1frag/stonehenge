@@ -41,4 +41,17 @@
             va.fadeIn();
         }
     </script>
-{%- endmacro %}
+{%- endmacro -%}
+
+{%- macro levels_for_form(levels) -%}
+    <h4>Level:</h4>
+    {% for i, l in levels %}
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox"
+                   name="levels" value="" id="l{{ i }}">
+            <label class="form-check-label" for="l{{ i }}">
+                {{ l['name'] }}
+            </label>
+        </div>
+    {% endfor %}
+{%- endmacro -%}

@@ -13,21 +13,25 @@
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#" onclick="tests()">Tests</a></h5>
-                    <p class="card-text">Here you can create new test
-                        and follow their statistics</p>
-                    <p>{{ created_tests }} tests created
-                        <a href="/tests/new">(create new)</a></p>
-                    <p>{{ sol_received }} solutions received
-                        <a href="/tests/stats">(see stats)</a></p>
+                    <h5 class="card-title"><a href="#" onclick="tests()">Тесты</a></h5>
+                    <p class="card-text">Здесь вы можете создавать новые тесты
+                    и смотреть за их статистикой</p>
+                    <p>создано {{ created_tests }} тестов
+                        <a href="/tests/new">(создать новый)</a></p>
+                    <p>получено {{ sol_received }} решений
+                        <a href="/tests/stats">(смотреть статистику)</a></p>
                 </div>
             </div>
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d9945066">
-                    <h5 class="card-title"><a href="#">Training videos</a></h5>
-                    <p class="card-text">Here you can upload training
-                        videos and follow their statistics</p>
+                    <h5 class="card-title"><a href="#">Тренировочные видео</a></h5>
+                    <p class="card-text">Здесь вы можете загружать новые
+                    обучающие видео или смотреть их статистику</p>
+                    <p>создано {{ created_video }} видео
+                        <a href="/video/new">(создать новое)</a></p>
+                    <p>{{ watched }} минут просмотров
+                        <a href="/video/stats">(смотреть статистику)</a></p>
                 </div>
             </div>
             <div class="card custom-card my-btn">

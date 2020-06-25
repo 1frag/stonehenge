@@ -167,3 +167,14 @@ begin
     return result;
 end;
 $$ language plpgsql;
+
+create or replace function get_count_of_solution_on_test(
+    test_id int
+) returns int as $$
+declare
+    res int;
+begin
+    select count(*) into res from app_marks where test=test_id;
+    return res;
+end;
+$$ language plpgsql;

@@ -328,7 +328,7 @@ async def profile_view(request: 'Request'):
         levels = await (
             await conn.execute('''
             select name, id=%s as current from app_levels order by force;
-            ''', (request.user.level, ))
+            ''', (request.user.level,))
         ).fetchall()  # todo: there something wrong: current not parsed by sqlalchemy
 
     return {'mission': request.user.mission,
@@ -395,19 +395,22 @@ async def create_new_test(request: 'Request'):
     raise web.HTTPFound('/')
 
 
+@aiohttp_jinja2.template('read_test.html')
 async def read_test(request: 'Request'):
     async with request.app.db.acquire() as conn:
         test_id = request.match_info.get('test_id')
-        res = await conn.execute('''
+        test = await (await conn.execute('''
         select * from app_tests
-        where id = %s''', (test_id,))
+        where id = %s''', (test_id,))).fetchone()
 
-        if one := await res.fetchone():
-            return web.Response(body=str(dict(one.items())))
-        raise web.json_response({
-            'error': '???',
-            'test_id': test_id,
-        })
+        if test is None:
+            raise web.HTTPNotFound()
+
+        test = request.app.test_ctrl.precalc_test_before_show(test)
+        return {
+            'test': test,
+            **request.to_jinja,
+        }
 
 
 @aiohttp_jinja2.template('exam_test.html')
@@ -434,11 +437,8 @@ async def exam_test_get(request: 'Request'):
         where id = %s''', data)).fetchone()
         if test is None:
             raise web.HTTPFound('/?no-more-tests')
-        test = dict(test.items())
-        if test['question_bytes']:
-            test['question_bytes'] = base64.encodebytes(test['question_bytes'])
-        if test['choice']:
-            test['choice'] = enumerate(test['choice'])
+
+        test = request.app.test_ctrl.precalc_test_before_show(test)
         return {'test': test}
 
 
@@ -469,3 +469,23 @@ async def exam_test_post(request: 'Request'):
         except UserAlreadyAnswerOnThisTest:
             raise web.HTTPBadRequest(body='choose other test')
         return web.json_response(result)
+
+
+@aiohttp_jinja2.template('exam_stats.html')
+async def exam_stats(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPFound('/login')
+
+    # потенциально сюда можно прикрутить пагинацию, но пока это не стоит
+    async with request.app.db.acquire() as conn:
+        if request.user.mission == 'teacher':
+            res = await request.app.test_ctrl.get_test_stat_for_teacher(
+                request.user.id, conn,
+            )
+            return {'res': res, **request.to_jinja}
+
+        elif request.user.mission == 'student':
+            res = await (await conn.execute('''
+            select * from app_marks where solver=%s
+            ''', (request.user.id,))).fetchall()
+            return res

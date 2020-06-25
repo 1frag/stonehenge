@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block other_in_head %}
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <link href="/static/css/favorite.css" rel="stylesheet">
+    <link href="/static/css/exam_test.css" rel="stylesheet">
+    <script src="/static/js/exam_test.js"></script>
+{% endblock %}
+{% block title %}
+    Exam page
+{% endblock %}
+{% block main %}
+    <div class="container"><br/>
+        {% if mission == 'teacher' %}
+            {{ test['querstion_txt'] }}
+            <img class="ques-pic"
+                 src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
+            <br/><br/>
+            <script>type_ans = '{{ test['type_answer'] }}'</script>
+            {% if test['type_answer'] == 'ch' %}
+                Choose one or more variant:<br/>
+                {% for i, ch in test['choice'] %}
+                    <button class="btn btn-choice {{ 'correct' if ch[1] else 'incorrect' }}"
+                         id="ch-btn-{{ i }}" disabled
+                            onclick="add_ch({{ i }}, this)">{{ ch[0] }}</button>
+                {% endfor %}
+            {% else %}
+                <input type="text" value="{{ test['correct'] }}" id="answer-plain-text"
+                       name="answer" class="input-group-addon q-inp" disabled>
+            {% endif %}
+        {% endif %}
+    </div>
+{% endblock %}

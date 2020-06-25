@@ -7,6 +7,7 @@ from multidict import MultiMapping
 import psycopg2
 import psycopg2.errors
 import json
+import base64
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +112,7 @@ class TestController:
                     'correct': list(correct & answer),
                     'incorrect': list(correct.symmetric_difference(answer)),
                 },
-                'mark': mark,
+                'mark': int(100 * mark / len(correct)),
             }
         else:
             if res['type_answer'] != 'pt' or not isinstance(answer, str):
@@ -123,7 +124,7 @@ class TestController:
             logger.debug('%s %s %s %s', r, answer, res['correct'], res['case_ins'])
             return {
                 'report': r,
-                'mark': 1 if r else 0,
+                'mark': 100 if r else 0,
             }
 
     async def set_mark_on_test(self, test_id, user_id, mark, conn: SAConnection):
@@ -135,6 +136,36 @@ class TestController:
         except psycopg2.Error as e:
             if psycopg2.errors.lookup(e.pgcode).__name__ == 'UniqueViolation':
                 raise UserAlreadyAnswerOnThisTest()
+
+    @staticmethod
+    def make_title_for_each_row(rows):
+        result = []
+        for row in rows:
+            result.append(dict(row))
+            result[-1]['title'] = row['question_txt'] or row['test']
+        logger.debug('return list of %s rows {%s}', len(result), result)
+        return result
+
+    async def get_test_stat_for_teacher(self, user_id, conn: SAConnection):
+        return self.make_title_for_each_row(
+            await (await conn.execute('''
+                select m.test, count(*), avg(m.point),
+                       percentile_cont(0.5) within group (order by m.point),
+                       t.*
+                from app_marks m
+                join app_tests t on m.test = t.id
+                where author=%s
+                group by m.test, t.id;
+            ''', (user_id,))).fetchall())
+
+    @staticmethod
+    def precalc_test_before_show(test):
+        test = dict(test.items())
+        if test['question_bytes']:
+            test['question_bytes'] = base64.encodebytes(test['question_bytes'])
+        if test['choice']:
+            test['choice'] = enumerate(test['choice'])
+        return test
 
 
 class UserMustSetLevel(Exception):

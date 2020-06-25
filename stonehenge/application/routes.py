@@ -45,6 +45,7 @@ def init_routes(app: 'Application') -> None:
     add_route('GET', r'/tests/{test_id:\d+}', read_test)
     add_route('GET', '/tests/exam', exam_test_get)
     add_route('POST', '/tests/exam', exam_test_post)
+    add_route('GET', '/tests/stats', exam_stats)
 
     # added static dir
     static = PROJECT_PATH / '..' / 'static'

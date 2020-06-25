@@ -16,3 +16,4 @@ if TYPE_CHECKING:
     class Request(aiohttp.web.Request):
         app: Application
         user: UserInformation
+        to_jinja: dict

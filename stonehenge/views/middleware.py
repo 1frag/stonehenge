@@ -18,6 +18,10 @@ async def identify_user(request: 'Request',
     if user_id is not None:  # check cookie
         async with request.app.db.acquire() as conn:  # check db
             request.user = await select_user_by_id(conn, user_id)
+            request.to_jinja = {
+                'mission': request.user.mission,
+                'login': request.user.login,
+            }
 
     return await handler(request)
 

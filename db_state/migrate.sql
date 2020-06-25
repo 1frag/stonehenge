@@ -58,6 +58,7 @@ create table app_marks (
     solver int references app_users(id) on delete cascade,
     point float4 not null,
     test int references app_tests(id) on delete cascade,
+    answer text,
     unique (solver, test)
 );
 

@@ -66,6 +66,7 @@ class Application(web.Application):
         if self.redis is not None:
             await self.redis.quit()
         self.redis = await aioredis.create_redis(self['config']['redis'])
+        self.redis_installed.set()
 
 
 def init_app(config: Optional[List[str]] = None) -> 'Application':

@@ -13,7 +13,7 @@ aiohttp_session[aioredis]~=2.9.0
 # database depends
 aiopg==1.0.0
 psycopg2-binary==2.8.5
-SQLAlchemy~=1.3.17
+SQLAlchemy~=1.3.18
 
 # tests
 pytest~=5.4.3

@@ -15,7 +15,7 @@ def main() -> None:
     if sys.argv[1] == 'runserver':
         web.run_app(
             app,
-            host=app_settings['host'],
+            host='0.0.0.0',
             port=app_settings['port'],
         )
 

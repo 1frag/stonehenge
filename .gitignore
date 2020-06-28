@@ -108,3 +108,5 @@ venv.bak/
 /prod.env
 **package-lock.json
 **node_modules
+stonehenge/db_state/private.sql
+*.mp4

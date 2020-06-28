@@ -3,6 +3,7 @@
     <link href="/static/css/style_index.css" rel="stylesheet">
     <link href="/static/css/favorite.css" rel="stylesheet">
     <script src="/static/js/new_video.js"></script>
+    <script src="/static/js/upload_big_file.js"></script>
 {% endblock %}
 {% block title %}
     New video
@@ -18,10 +19,16 @@
                 Дополнительный текстовый материал:
             </label>
             <textarea id="description" class="form-control" name="description"></textarea>
-            <input type="file" class="form-control-file" id="video_file" required>
+            <input type="file"
+                   class="form-control-file"
+                   id="video_file" required
+                   name="video_file">
             {{ feachers.levels_for_form(levels) }}
-            <input type="button" class="btn btn-primary mb-2" value="Добавить"
-            onclick="ok_btn()">
+            <input type="button"
+                   class="btn btn-primary mb-2"
+                   value="Добавить"
+                   onclick="ok_btn()">
+            <p id="dbi-upload-progress"></p>
         </form>
     </div>
 {% endblock %}

@@ -63,10 +63,12 @@ class Application(web.Application):
         self.video_ctrl = VideoController()
 
     async def refresh_redis(self):
-        if self.redis is not None:
-            await self.redis.quit()
+        try:
+            if self.redis is not None:
+                await self.redis.quit()
+        except Exception as e:
+            print(f'refreshing redis, {e.__class__}: {e}')
         self.redis = await aioredis.create_redis(self['config']['redis'])
-        self.redis_installed.set()
 
 
 def init_app(config: Optional[List[str]] = None) -> 'Application':

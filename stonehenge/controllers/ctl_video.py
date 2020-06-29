@@ -1,11 +1,14 @@
 import asyncio
 import aiomisc
 import uuid
+import logging
 from aiohttp import client
 from multidict import MultiMapping
 from aiopg.sa import SAConnection
 
 from stonehenge.utils.constants import *
+
+logger = logging.getLogger(__name__)
 
 
 class VideoController:
@@ -16,39 +19,38 @@ class VideoController:
     _local_path = PROJECT_DIR / 'static' / 'files'
     _path_on_disk = 'disk:/stonehenge/'
     _api_url = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload'
+    _stub_file = 'http://stonehenge-edu.herokuapp.com/static/files/readme.md'
 
     @staticmethod
-    def validate(data: MultiMapping):
-        if 'video_file' not in data:
-            return None, 'Файл с видео должен быть прикреплен'
-        if 'levels' not in data or len(data.getall('levels')) == 0:
+    def validate(data: dict):
+        if 'levels' not in data or len(data['levels']) == 0:
             return None, 'Укажите подходящие уровни знаний'
         if 'title' not in data:
             return None, 'Требуется указать название'
+        if 'video_file' not in data:
+            logger.debug('missed video_file field')
+            return None, ''
 
-        return {'title': data.getone('title'),
-                'video_file': data.getone('question_file'),
-                'levels': data.getall('levels'),
-                'description': data.getone('description', '')}, None
+        return {'title': data.get('title'),
+                'video_file': data.get('video_file'),
+                'levels': data.get('levels'),
+                'description': data.get('description', '')}, None
 
-    @aiomisc.threaded
-    def save_on_localhost(self, bytes_to_save):
-        name = f'{uuid.uuid4().hex}.mp4'
-        with open(name, 'wb') as f:
-            f.write(bytes_to_save)
-        return name
-
-    async def upload_to_cloud(self, name):
+    async def _upload_to_cloud(self, name):
+        if not os.getenv('YANDEX_API_ACTIVE', False):
+            return self._url + name
         opts = {
             'path': self._path_on_disk + name,
-            'url': self._url + name,
+            'url': (self._url + name) if PRODUCTION else self._stub_file,
         }
         async with client.ClientSession() as session:
             async with session.post(self._api_url, params=opts,
                                     headers=self._headers) as resp:
-                return (await resp.json())['href']
+                j = await resp.json(encoding='utf-8')
+                logger.debug('json from yandex cloud: %s', j)
+                return j['href']
 
-    async def create_row_in_db(self, name, title, href, levels, desc, conn: SAConnection):
+    async def _create_row_in_db(self, name, title, href, levels, desc, conn: SAConnection):
         video_id = await (await conn.execute('''
             insert into app_video (cloud_path, cloud_href, title, description)
             values (%s, %s, %s, %s)
@@ -63,10 +65,11 @@ class VideoController:
 
     async def create_new(self, title, video_file, levels, description,
                          conn: SAConnection):
-        name = await self.save_on_localhost(video_file)
-        href = await self.upload_to_cloud(name)
-        video_id = await self.create_row_in_db(name, title, href, levels,
-                                               description, conn)
+        if not os.path.isfile(self._local_path / video_file):
+            return None
+        href = await self._upload_to_cloud(video_file)
+        video_id = await self._create_row_in_db(video_file, title, href,
+                                                levels, description, conn)
         # todo: должен быть механизм подчистки локального стоража,
         #  но это в будущем
         return video_id

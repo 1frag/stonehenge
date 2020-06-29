@@ -11,8 +11,10 @@
 {% block main %}
     <div class="container"><br/>
         {{ test['querstion_txt'] }}
-        <img class="ques-pic"
-             src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
+        {% if test['question_bytes'] %}
+            <img class="ques-pic"
+                 src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
+        {% endif %}
         <br/><br/>
         <script>type_ans = '{{ test['type_answer'] }}'</script>
         {% if test['type_answer'] == 'ch' %}

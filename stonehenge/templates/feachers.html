@@ -48,7 +48,7 @@
     {% for i, l in levels %}
         <div class="form-check">
             <input class="form-check-input" type="checkbox"
-                   name="levels" value="" id="l{{ i }}">
+                   name="levels" id="l{{ i }}" value="{{ l['name'] }}">
             <label class="form-check-label" for="l{{ i }}">
                 {{ l['name'] }}
             </label>

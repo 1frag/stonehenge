@@ -1,0 +1,71 @@
+import aiohttp_jinja2
+import aiohttp_session
+import uuid
+import base64
+
+from aiohttp import web
+
+from stonehenge.controllers.ctl_users import *
+from stonehenge.utils.type_helper import *
+from stonehenge.controllers import *
+from stonehenge.utils.common import get_logger
+from stonehenge.utils.constants import PROJECT_DIR
+
+logger = get_logger(__name__)
+dir_for_files = PROJECT_DIR / 'static' / 'files'
+
+
+@aiohttp_jinja2.template('create_new_video.html')
+async def new_video_get(request: 'Request'):
+    if request.user is None or request.user.mission != 'teacher':
+        raise web.HTTPFound('/')
+    async with request.app.db.acquire() as conn:
+        levels = await get_levels(conn)
+    return {'levels': enumerate(levels), **request.to_jinja}
+
+
+async def new_video_post(request: 'Request'):
+    n = uuid.uuid4().hex + '.mp4'
+    with open(dir_for_files / n, 'w') as f:
+        f.write('')  # now we just create this file
+
+    await request.app.redis.set('author_' + n, request.user.id)
+    logger.debug('redis: add(%s, %s)', 'author_' + n, request.user.id)
+    return web.Response(status=201, body=n)
+
+
+async def new_video_upload(request: 'Request'):
+    data = await request.json()
+    if 'file_data' not in data or 'n' not in data:
+        raise web.HTTPBadRequest()
+
+    author = await request.app.redis.get('author_' + data['n'])
+    logger.debug('redis: get(%s, %s)', 'author_' + data['n'], author)
+    if author != str(request.user.id).encode():
+        logger.info('forbidden access to %s from %s',
+                    data['n'], request.user.id)
+        raise web.HTTPForbidden()
+
+    try:
+        # file data looks like 'data:application/octet-stream;base64,AAAAGG...'
+        b64_data = data['file_data'].split(';')[1].split(',')[1].encode()
+    except (KeyError, IndexError, TypeError):
+        logger.error('Unexpected data format %s', data['file_data'])
+        raise web.HTTPBadRequest()
+
+    with open(dir_for_files / data['n'], 'ab+') as f:
+        f.write(base64.decodebytes(b64_data))
+
+    return web.Response(status=202, body=b'Ok')
+
+
+async def new_video_updated(request: 'Request'):
+    data = await request.json()
+    resp, err = request.app.video_ctrl.validate(data)
+    if resp is None:
+        raise web.HTTPBadRequest(body=err)
+    async with request.app.db.acquire() as conn:
+        video_id = await request.app.video_ctrl.create_new(
+            **resp, conn=conn
+        )
+    return web.Response(status=202, body=str(video_id))

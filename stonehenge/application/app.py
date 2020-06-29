@@ -10,12 +10,14 @@ import aiopg.sa
 from aiohttp import web
 import jinja2
 import asyncio
+import aiohttp.client
 import aioredis
 
 from stonehenge.application.routes import init_routes, init_sessions, init_redis
 from stonehenge.utils.common import init_config
 from stonehenge.views.middleware import init_middlewares
-from stonehenge.controllers import TestController
+from stonehenge.controllers import TestController, VideoController
+from stonehenge.utils.constants import *
 
 path = Path(__file__).parent.parent
 db_set = asyncio.Event()
@@ -52,14 +54,20 @@ class Application(web.Application):
     db: aiopg.sa.engine.Engine
     redis_installed = asyncio.Event()
     sessions_installed = asyncio.Event()
+    test_ctrl: TestController
+    video_ctrl: VideoController
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.test_ctrl = TestController()
+        self.video_ctrl = VideoController()
 
     async def refresh_redis(self):
-        if self.redis is not None:
-            await self.redis.quit()
+        try:
+            if self.redis is not None:
+                await self.redis.quit()
+        except Exception as e:
+            print(f'refreshing redis, {e.__class__}: {e}')
         self.redis = await aioredis.create_redis(self['config']['redis'])
 
 

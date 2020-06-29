@@ -55,12 +55,12 @@ class TestController:
                 'question_bytes': data.getone('question_file', b''),
                 'levels': data.getall('levels')}, None
 
+    @staticmethod
     async def create_new_test(
-            self, type_answer, correct, case_ins, choice,
+            type_answer, correct, case_ins, choice,
             question_txt, question_bytes: Union[web.FileField, bytes],
             levels, author, conn: SAConnection,
     ):
-
         if isinstance(question_bytes, web.FileField):
             file_bytes = question_bytes.file.read()
         else:
@@ -159,11 +159,11 @@ class TestController:
     async def get_test_stat_for_teacher(self, user_id, conn: SAConnection):
         return self.make_title_for_each_row(
             await (await conn.execute('''
-                select m.test, count(*), avg(m.point),
+                select m.test, count(m.answer), avg(m.point),
                        percentile_cont(0.5) within group (order by m.point),
                        t.*
                 from app_marks m
-                join app_tests t on m.test = t.id
+                right join app_tests t on m.test = t.id
                 where author=%s
                 group by m.test, t.id;
             ''', (user_id,))).fetchall())

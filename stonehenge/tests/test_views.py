@@ -24,4 +24,4 @@ async def test_execute_anything():
     )  # type: aiopg.sa.engine.Engine
     conn = await db.acquire()  # type: aiopg.sa.connection.SAConnection
     yield conn
-    conn.close()
+    await conn.close()

@@ -23,10 +23,13 @@ runall:
 	docker-compose up -d
 
 restart_app:
-	docker-compose restart stonehenge_app
+	docker-compose restart app
 
 follow-local-logs:
-	docker-compose logs --tail=20 -f stonehenge_app
+	docker-compose logs --tail=20 -f app
 
 docker-bash:
-	docker-compose run --rm stonehenge_app /bin/bash
+	docker-compose run --rm app /bin/bash
+
+migrate:
+	docker-compose exec app python -m stonehenge migrate

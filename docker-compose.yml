@@ -2,13 +2,12 @@ version: "3.3"
 
 services:
 
-  stonehenge_app: &app
+  app: &app
     tty: true
     build:
       context: .
       args:
         requirements: requirements.txt
-    container_name: stonehenge
     environment:
       - DEBUG=True
       - SETTINGS_FILE=api.dev.yml
@@ -20,6 +19,7 @@ services:
       - .:/app
     depends_on:
       - postgres
+      - redis
     ports:
       - 8081:8000
     networks:
@@ -41,21 +41,22 @@ services:
         aliases:
           - local.db.stonehenge
 
-#  test:
-#    <<: *app
-#    container_name: stonehenge_test
-#    ports:
-#      - 8082:8082
-#    entrypoint: py.test -v -p no:warnings
-#    command: ''
+  app_for_test:
+    <<: *app
+    container_name: test
+    entrypoint: py.test -v -p no:warnings
+    command: ''
 
-  stonehenge_nginx:
+  nginx:
     image: nginx:mainline-alpine
     container_name: "stonehenge_nginx"
+    depends_on:
+      - app
     ports:
       - "8080:8080"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./stonehenge/static:/usr/share/nginx/static
     networks:
       stonetwork:
         aliases:

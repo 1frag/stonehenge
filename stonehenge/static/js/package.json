@@ -1,8 +1,0 @@
-{
-    "name": "stonehenge",
-    "description": "stonehenge",
-    "version": "0.0.1",
-    "dependencies": {
-        "blueimp-md5": "^2.16.0"
-    }
-}

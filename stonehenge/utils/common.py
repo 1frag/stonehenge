@@ -36,7 +36,6 @@ def get_db_url(test=False, readable=False):
 def get_config(test=False, readable=False):
     options = {
         'app': {
-            'host': HOST,
             'port': os.getenv('PORT', 8080),
             'domain': os.getenv('DOMAIN', 'http://localhost:8080'),
         },

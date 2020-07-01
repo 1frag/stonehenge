@@ -66,6 +66,21 @@ async def new_video_updated(request: 'Request'):
         raise web.HTTPBadRequest(body=err)
     async with request.app.db.acquire() as conn:
         video_id = await request.app.video_ctrl.create_new(
-            **resp, conn=conn
+            **resp, author=request.user.id, conn=conn,
         )
     return web.Response(status=202, body=str(video_id))
+
+
+@aiohttp_jinja2.template('read_video.html')
+async def read_video(request: 'Request'):
+    if request.user is None or request.user.mission == 'advertiser':
+        raise web.HTTPFound('/')
+
+    vid = request.match_info['video_id']
+    async with request.app.db.acquire() as conn:
+        video = await request.app.video_ctrl.basic_view_video(
+            vid, request.user.id, conn=conn,
+        )
+        if video is None:
+            raise web.HTTPNotFound()
+    return {'video': video, **request.to_jinja}

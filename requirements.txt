@@ -29,7 +29,7 @@ cryptography~=2.9.2
 requests==2.24.0
 click~=7.1.2
 Jinja2~=2.11.2
-ipython~=7.15.0
+ipython~=7.16.1
 certifi~=2020.6.20
 trafaret==1.2.0  # depends by outdated code from aiohttp_admin
 multidict~=4.7.6

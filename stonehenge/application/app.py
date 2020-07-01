@@ -59,8 +59,9 @@ class Application(web.Application):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        init_config(self)
         self.test_ctrl = TestController()
-        self.video_ctrl = VideoController()
+        self.video_ctrl = VideoController(self['domain'])
 
     async def refresh_redis(self):
         try:
@@ -73,7 +74,6 @@ class Application(web.Application):
 
 def init_app(config: Optional[List[str]] = None) -> 'Application':
     app = Application()
-    init_config(app)
     init_jinja2(app)
     init_routes(app)
     app.cleanup_ctx.extend([

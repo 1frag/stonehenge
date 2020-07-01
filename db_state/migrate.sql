@@ -174,7 +174,8 @@ create table app_video (
     cloud_path text not null, -- disk:/stonehenge/...
     cloud_href text not null, -- https://cloud.../...
     title varchar(128) not null,
-    description text
+    description text,
+    author int references app_users(id) on delete set null
 );
 
 create table app_video_levels (

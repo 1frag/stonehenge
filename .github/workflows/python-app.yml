@@ -8,6 +8,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+      - name: Stub for prod.env
+        run: touch prod.env
       - name: Integration test
         run: docker-compose up -d app_for_test
       - name: Run tests

@@ -45,6 +45,8 @@ services:
     <<: *app
     container_name: test
     entrypoint: /bin/bash
+    ports: [8090]
+    working_dir: /app
     command: ''
 
   nginx:

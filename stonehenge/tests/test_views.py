@@ -20,6 +20,7 @@ async def test_check_user_table(conn: SAConnection):
     ''', ('test_login', 'test_first_name', 'test_last_name',
           'test_email', 'student', 'google'))
     user_id = await q1.fetchone()
+    assert user_id is not None
 
     q2 = await conn.execute('''
     select login, first_name, last_name from app_users
@@ -35,9 +36,3 @@ async def test_when_user_unauthorized(app, aiohttp_client):
     client = await aiohttp_client(app)
     resp = await client.get('/')
     assert resp.real_url.path == '/login'
-
-
-async def test_login_when_user_is_student(app, aiohttp_client, student):
-    client = await aiohttp_client(app)
-async def test_login_when_user_is_teacher(app, aiohttp_client, student):
-    client = await aiohttp_client(app)

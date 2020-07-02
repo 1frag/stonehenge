@@ -13,7 +13,7 @@ jobs:
       - name: Integration test
         run: docker-compose up -d app_for_test
       - name: Run tests
-        run: docker-compose exec app_for_test pytest --html=report.html
+        run: docker-compose exec -T app_for_test pytest --html=report.html
       - name: Upload math result for job 1
         uses: actions/upload-artifact@v1
         with:

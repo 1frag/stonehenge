@@ -84,7 +84,7 @@ async def conn(db) -> aiopg.sa.SAConnection:
 
 
 @pytest.fixture
-def app():
+def app(conn):  # using conn for creating db tables
     from stonehenge.application.app import init_app
     yield init_app(True)
 

@@ -11,7 +11,7 @@ jobs:
       - name: Stub for prod.env
         run: touch prod.env
       - name: Integration test
-        run: docker-compose up -d app_for_test
+        run: docker-compose up --build -d app_for_test
       - name: Run tests
         run: docker-compose exec -T app_for_test pytest --html=report.html
       - name: Upload math result for job 1

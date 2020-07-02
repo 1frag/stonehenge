@@ -8,13 +8,13 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - name: Stub for prod.env
+      - name: Create stub for prod.env
         run: touch prod.env
-      - name: Integration test
+      - name: Build container
         run: docker-compose up --build -d app_for_test
       - name: Run tests
         run: docker-compose exec -T app_for_test pytest --html=report.html
-      - name: Upload math result for job 1
+      - name: Upload result
         uses: actions/upload-artifact@v1
         with:
           name: homework

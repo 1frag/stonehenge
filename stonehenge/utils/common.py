@@ -5,6 +5,7 @@ import logging
 from aiohttp import web
 
 from stonehenge.utils.constants import HOST
+from stonehenge.utils.type_helper import *
 
 PATH = pathlib.Path(__file__).parent.parent.parent
 logging.basicConfig(
@@ -49,8 +50,8 @@ def get_config(test=False, readable=False):
     return options
 
 
-def init_config(app: web.Application) -> None:
-    app['config'] = get_config()
+def init_config(app: 'Application') -> None:
+    app['config'] = get_config(test=app.is_test)
 
 
 def get_logger(name):

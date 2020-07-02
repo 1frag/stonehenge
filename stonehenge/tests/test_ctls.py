@@ -12,9 +12,11 @@ async def test_validate_form_create_new_test():
         ('levels', 'A2'),
     ])
     t = TestController()
+    print(t.validate(data))
     assert t.validate(data) == (
-        ({'txt': 'qwe', 'bytes': b''},
-         {'type': 'pt', 'correct': 'asd', 'case-ins': True},
-         ['A1', 'A2']),
-        None
+        {'type_answer': 'pt', 'correct': 'asd',
+         'case_ins': True, 'choice': None,
+         'question_txt': 'qwe', 'question_bytes': b'',
+         'levels': ['A1', 'A2']
+         }, None
     )

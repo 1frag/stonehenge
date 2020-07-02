@@ -1,8 +1,3 @@
-drop extension if exists hstore cascade;
-drop schema public cascade;
-create schema public;
-create extension if not exists hstore;
-
 create table app_levels (
     id serial primary key,
     name varchar(64) unique not null,

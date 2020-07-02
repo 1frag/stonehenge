@@ -57,11 +57,12 @@ class Application(web.Application):
     test_ctrl: TestController
     video_ctrl: VideoController
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, is_test=False, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.is_test = is_test
         init_config(self)
         self.test_ctrl = TestController()
-        self.video_ctrl = VideoController(self['domain'])
+        self.video_ctrl = VideoController(self['config']['app']['domain'])
 
     async def refresh_redis(self):
         try:
@@ -72,8 +73,8 @@ class Application(web.Application):
         self.redis = await aioredis.create_redis(self['config']['redis'])
 
 
-def init_app(config: Optional[List[str]] = None) -> 'Application':
-    app = Application()
+def init_app(is_test=False) -> 'Application':
+    app = Application(is_test=is_test)
     init_jinja2(app)
     init_routes(app)
     app.cleanup_ctx.extend([

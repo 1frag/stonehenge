@@ -82,12 +82,8 @@ async def conn(db) -> aiopg.sa.SAConnection:
     async with db.acquire() as conn:
         yield conn
 
+
 @pytest.fixture
 def app():
     from stonehenge.application.app import init_app
     yield init_app(True)
-
-
-@pytest.fixture
-def client(app, aiohttp_client):
-    yield aiohttp_client(app)

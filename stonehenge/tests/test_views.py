@@ -3,8 +3,9 @@ from pytest_aiohttp import aiohttp_client
 from aiopg.sa import SAConnection
 
 
-async def test_index_view(client) -> None:
-    resp = await client.get('/')  # todo: make hinting for fixtures
+async def test_index_view(app, aiohttp_client) -> None:
+    client = await aiohttp_client(app)
+    resp = await client.get('/', timeout=1)
 
     assert resp.status == 200
 

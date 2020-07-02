@@ -13,6 +13,8 @@ logger = logging.getLogger(__name__)
 
 
 class TestController:
+    __test__ = False
+
     def __init__(self):
         self._reg_for_user_list = re.compile(r'a\d+')
 

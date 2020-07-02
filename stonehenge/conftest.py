@@ -11,17 +11,9 @@ TEST_CONFIG_PATH = PATH / 'config' / 'api.test.yml'
 CONFIG_PATH = PATH / 'config' / 'api.dev.yml'
 
 test_config = get_config(test=True, readable=True)
-test_engine = create_engine(
-    get_db_url(test=True)['dsn'],
-    isolation_level='AUTOCOMMIT',
-)
-engine = create_engine(
-    get_db_url(test=False)['dsn'],
-    isolation_level='AUTOCOMMIT',
-)
 
 
-def setup_test_db(engine) -> None:
+async def setup_test_db(engine) -> None:
     """
     Removing the old test database environment and creating new clean
     environment.
@@ -31,21 +23,19 @@ def setup_test_db(engine) -> None:
     db_user = test_config['postgres']['user']
     db_password = test_config['postgres']['password']
 
-    teardown_test_db(engine)
-
-    with engine.connect() as conn:
-        conn.execute(
+    async with engine.acquire() as conn:
+        await conn.execute(
             f"create user {db_user} with password '{db_password}'"
         )
-        conn.execute(
+        await conn.execute(
             f"create database {db_name} encoding 'UTF8'"
         )
-        conn.execute(
+        await conn.execute(
             f"grant all privileges on database {db_name} to {db_user}"
         )
 
 
-def teardown_test_db(engine) -> None:
+async def teardown_test_db(engine) -> None:
     """
     Removing the test database environment.
     """
@@ -53,8 +43,8 @@ def teardown_test_db(engine) -> None:
     db_name = test_config['postgres']['database']
     db_user = test_config['postgres']['user']
 
-    with engine.connect() as conn:
-        conn.execute(
+    async with engine.acquire() as conn:
+        await conn.execute(
             f"""
             SELECT pg_terminate_backend(pg_stat_activity.pid)
             FROM pg_stat_activity
@@ -62,19 +52,59 @@ def teardown_test_db(engine) -> None:
             AND pid <> pg_backend_pid();
             """
         )
-        conn.execute(f"drop database if exists {db_name}")
-        conn.execute(f"drop role if exists {db_user}")
+        await conn.execute(f"drop database if exists {db_name}")
+        await conn.execute(f"drop role if exists {db_user}")
 
 
 # fixtures
+@pytest.fixture
+async def db():
+    print('when False:' + get_db_url(test=False)['dsn'])
+    print('when True:' + get_db_url(test=True)['dsn'])
+    real_engine = await aiopg.sa.create_engine(
+        get_db_url(test=False)['dsn'],
+    )
+    await teardown_test_db(real_engine)
+    await setup_test_db(real_engine)
 
-@pytest.yield_fixture(scope='session')
-def db():
-    setup_test_db(engine)
-    yield
-    teardown_test_db(engine)
+    test_engine = await aiopg.sa.create_engine(
+        get_db_url(test=True)['dsn'],
+    )
+    async with test_engine.acquire() as conn:
+        with open('./db_state/migrate.sql') as m:
+            await conn.execute(m.read())
+    yield test_engine
+    # await teardown_test_db(real_engine)
 
 
 @pytest.fixture
-async def sa_engine(loop):
-    return await aiopg.sa.create_engine(**test_config['postgres'])
+async def conn(db) -> aiopg.sa.SAConnection:
+    async with db.acquire() as conn:
+        yield conn
+
+
+@pytest.fixture
+def app(conn):  # using conn for creating db tables
+    from stonehenge.application.app import init_app
+    yield init_app(True)
+
+
+@pytest.fixture
+async def student(conn):
+    q1 = await conn.execute('''
+    select create_new_user(
+        %s, -- cur_login
+        %s, -- cur_email
+        %s, -- cur_first_name
+        %s, -- cur_last_name
+        %s, -- cur_mission
+        %s, -- cur_password
+        %s, -- google_user
+        %s -- vk_user
+    );''', ('student', 'student@stonehenge', 'A', 'B', 'student',
+            None, 12345678901234567890123456789, None))
+    student_id = await q1.fetchone()
+    assert student_id is not None
+    q2 = await conn.execute('select * from app_users '
+                            'where id=%s', (student_id, ))
+    yield await q2.fetchone()

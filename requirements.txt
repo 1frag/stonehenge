@@ -20,6 +20,7 @@ pytest~=5.4.3
 pytest-cov~=2.10.0
 pytest-aiohttp~=0.3.0
 pytest-asyncio~=0.14.0
+pytest-html~=2.1.1
 mypy~=0.782
 flake8~=3.8.3
 black~=19.10b0
@@ -29,7 +30,7 @@ cryptography~=2.9.2
 requests==2.24.0
 click~=7.1.2
 Jinja2~=2.11.2
-ipython~=7.15.0
+ipython~=7.16.1
 certifi~=2020.6.20
 trafaret==1.2.0  # depends by outdated code from aiohttp_admin
 multidict~=4.7.6

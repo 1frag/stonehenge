@@ -15,11 +15,13 @@ class VideoController:
     _headers = {
         'Authorization': 'OAuth ' + YANDEX_ACCESS_TOKEN,
     }
-    _url = HOST + '/static/files'
     _local_path = PROJECT_DIR / 'static' / 'files'
     _path_on_disk = 'disk:/stonehenge/'
     _api_url = 'https://cloud-api.yandex.net:443/v1/disk/resources/upload'
     _stub_file = 'http://stonehenge-edu.herokuapp.com/static/files/readme.md'
+
+    def __init__(self, domain):
+        self._url = domain + '/static/files/'
 
     @staticmethod
     def validate(data: dict):
@@ -50,12 +52,19 @@ class VideoController:
                 logger.debug('json from yandex cloud: %s', j)
                 return j['href']
 
-    async def _create_row_in_db(self, name, title, href, levels, desc, conn: SAConnection):
+    async def _create_row_in_db(
+            self, name, title, href, levels,
+            desc, author, conn: SAConnection
+    ):
         video_id = await (await conn.execute('''
-            insert into app_video (cloud_path, cloud_href, title, description)
-            values (%s, %s, %s, %s)
+            insert into app_video (
+                cloud_path, cloud_href, title,
+                description, author
+            )
+            values (%s, %s, %s, %s, %s)
             returning id;
-        ''', (self._path_on_disk + name, href, title, desc))).fetchone()
+        ''', (self._path_on_disk + name, href, title, desc, author))
+                          ).fetchone()
         await conn.execute('''
             insert into app_tests_levels (test_id, level_id)
             select %s, id as level_id from app_levels
@@ -64,12 +73,19 @@ class VideoController:
         return video_id
 
     async def create_new(self, title, video_file, levels, description,
-                         conn: SAConnection):
+                         author, conn: SAConnection):
         if not os.path.isfile(self._local_path / video_file):
             return None
         href = await self._upload_to_cloud(video_file)
-        video_id = await self._create_row_in_db(video_file, title, href,
-                                                levels, description, conn)
-        # todo: должен быть механизм подчистки локального стоража,
-        #  но это в будущем
+        video_id = await self._create_row_in_db(
+            video_file, title, href, levels, description, author, conn,
+        )
         return video_id
+
+    @staticmethod
+    async def basic_view_video(vid, user_id, conn: SAConnection):
+        return await (await conn.execute('''
+            select title, cloud_href, description,
+            author=%s from app_video
+            where id=%s
+        ''', (user_id, vid))).fetchone()

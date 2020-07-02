@@ -51,6 +51,7 @@ def init_routes(app: 'Application') -> None:
     add_route('POST', '/video/new', views.video.new_video_post)
     add_route('POST', '/video/upload', views.video.new_video_upload)
     add_route('POST', '/video/updated', views.video.new_video_updated)
+    add_route('GET', r'/video/{video_id:\d+}', views.video.read_video)
 
     # added static dir
     static = PROJECT_PATH / '..' / 'static'

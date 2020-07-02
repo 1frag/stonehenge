@@ -44,7 +44,9 @@ services:
   app_for_test:
     <<: *app
     container_name: test
-    entrypoint: py.test -v -p no:warnings
+    entrypoint: /bin/bash
+    ports: [8090]
+    working_dir: /app
     command: ''
 
   nginx:

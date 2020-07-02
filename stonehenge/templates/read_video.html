@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block other_in_head %}
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <link href="/static/css/favorite.css" rel="stylesheet">
+    <link href="/static/css/read_video.css" rel="stylesheet">
+{% endblock %}
+{% block title %}
+    {{ video['title'] }}
+{% endblock %}
+{% block main %}
+    <div class="container"><br/>
+        <h2>{{ video['title'] }}</h2><br/>
+        <video controls>
+            <source src="{{ video['cloud_href'] }}"
+                    type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+
+        <br/>
+        <p>{{ video['description'] }}</p>
+        <p></p>
+    </div>
+{% endblock %}

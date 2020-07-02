@@ -110,3 +110,4 @@ venv.bak/
 **node_modules
 stonehenge/db_state/private.sql
 *.mp4
+report.html

@@ -10,26 +10,6 @@ async def test_index_view(app, aiohttp_client) -> None:
     assert resp.status == 200
 
 
-async def test_execute_in_db():
-    """
-    Use:
-    from stonehenge.tests.test_views import test_execute_anything
-    db_state = test_execute_anything()
-    conn = await db_state.__anext__()
-    ...
-    await db_state.__anext__()
-    """
-    import aiopg.sa
-    from stonehenge.utils.common import get_config
-
-    db = await aiopg.sa.create_engine(
-        **get_config()['postgres']
-    )  # type: aiopg.sa.engine.Engine
-    conn = await db.acquire()  # type: aiopg.sa.connection.SAConnection
-    yield conn
-    await conn.close()
-
-
 @pytest.mark.asyncio
 async def test_check_user_table(conn: SAConnection):
     q1 = await conn.execute('''
@@ -49,3 +29,15 @@ async def test_check_user_table(conn: SAConnection):
     assert user['login'] == 'test_login'
     assert user['first_name'] == 'test_first_name'
     assert user['last_name'] == 'test_last_name'
+
+
+async def test_when_user_unauthorized(app, aiohttp_client):
+    client = await aiohttp_client(app)
+    resp = await client.get('/')
+    assert resp.real_url.path == '/login'
+
+
+async def test_login_when_user_is_student(app, aiohttp_client, student):
+    client = await aiohttp_client(app)
+async def test_login_when_user_is_teacher(app, aiohttp_client, student):
+    client = await aiohttp_client(app)

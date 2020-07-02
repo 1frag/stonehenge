@@ -87,3 +87,24 @@ async def conn(db) -> aiopg.sa.SAConnection:
 def app():
     from stonehenge.application.app import init_app
     yield init_app(True)
+
+
+@pytest.fixture
+async def student(conn):
+    q1 = await conn.execute('''
+    select create_new_user(
+        %s, -- cur_login
+        %s, -- cur_email
+        %s, -- cur_first_name
+        %s, -- cur_last_name
+        %s, -- cur_mission
+        %s, -- cur_password
+        %s, -- google_user
+        %s -- vk_user
+    );''', ('student', 'student@stonehenge', 'A', 'B', 'student',
+            None, 12345678901234567890123456789, None))
+    student_id = await q1.fetchone()
+    assert student_id is not None
+    q2 = await conn.execute('select * from app_users '
+                            'where id=%s', (student_id, ))
+    yield await q2.fetchone()

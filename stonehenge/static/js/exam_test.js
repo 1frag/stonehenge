@@ -49,11 +49,11 @@ function ok() {
 function add_ch(i, btn) {
     correct.add(i);
     $(btn).addClass('chosen-choice');
-    btn.onclick = function () {
+    $(btn).click(() => {
         correct.delete(i);
         $(btn).removeClass('chosen-choice');
-        btn.onclick = () => add_ch(i, btn);
-    };
+        $(btn).click(() => add_ch(i, btn));
+    });
 }
 
 function next() {

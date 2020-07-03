@@ -76,16 +76,16 @@ async def exam_test_get(request: 'Request'):
             raise web.HTTPFound('/profile?set_up_level')
         if data is None:
             return aiohttp_jinja2.render_template(
-                'error.html', request, {'error': 'there is no tests'}
+                'error.html', request, {'error': 'there is no test'}
             )
         test = await (await conn.execute('''
-        select * from app_tests
-        where id = %s''', data)).fetchone()
+            select * from app_tests
+            where id = %s''', data)).fetchone()
         if test is None:
             raise web.HTTPFound('/?no-more-tests')
 
         test = request.app.test_ctrl.precalc_test_before_show(test)
-        return {'test': test}
+        return {'test': test, **request.to_jinja}
 
 
 async def exam_test_post(request: 'Request'):

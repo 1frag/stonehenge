@@ -55,3 +55,47 @@
         </div>
     {% endfor %}
 {%- endmacro -%}
+
+{%- macro view_test(test, show_for) -%}
+    {# show_as must be in ['teacher', 'student_on_exam', 'student_after_exam'] #}
+    <h3>{{ test['question_txt'] }}</h3>
+    {% if test['question_bytes'] %}
+        <img class="ques-pic"
+             src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
+    {% endif %}
+    <script src="/static/js/exam_test.js"></script>
+    <script>type_ans = '{{ test['type_answer'] }}'</script>
+
+    {% if test['type_answer'] == 'ch' %}
+        {{ 'Выбирете' if show_for == 'student_on_exam' else 'Требуется выбрать'}}
+        один или более вариантов:<br/>
+        {% for i, ch in test['choice'] %}
+            <button class="btn btn-choice" id="ch-btn-{{ i }}">{{ ch[0] }}</button>
+            <script>
+                var cur_btn = $('#ch-btn-{{ i }}');
+                {% if show_for == 'student_on_exam' %}
+                    {# только на экзамене добавляем реакцию на нажатие #}
+                    cur_btn.click(() => add_ch({{ i }}, '#ch-btn-{{ i }}'));
+                {% else %}
+                    {# иначе подсветим правильность этого варианта #}
+                    cur_btn.addClass('{{ 'correct' if ch[1] else 'incorrect' }}');
+                {% endif %}
+            </script>
+        {% endfor %}
+    {% else %}
+        {% if show_for == 'student_on_exam' %}
+            <label for="answer-plain-text">Введите ответ на вопрос.</label>
+            <input type="text" value="{{ test['correct'] }}"
+                   id="answer-plain-text" name="answer" class="input-group-addon q-inp">
+        {% else %}
+            Правильный ответ: {{ test['correct'] }}<br/>
+        {% endif %}
+    {% endif %}
+
+    {% if show_for == 'student_after_exam' %}<br/>
+        Вы отвелили: {{ test['answer'] }}<br/>
+        Получено баллов: {{ test['point'] }} / 100<br/>
+    {% else %}
+
+    {% endif %}
+{%- endmacro -%}

@@ -3,7 +3,6 @@
     <link href="/static/css/style_index.css" rel="stylesheet">
     <link href="/static/css/favorite.css" rel="stylesheet">
     <link href="/static/css/exam_test.css" rel="stylesheet">
-    <script src="/static/js/exam_test.js"></script>
 {% endblock %}
 {% block title %}
     Exam page
@@ -13,27 +12,16 @@
         <input type="hidden" value="{{ test['id'] }}" id="test_id">
         {{ feachers.error_div() }}
         <br/>
-        {{ test['querstion_txt'] }}
-        <img class="ques-pic"
-             src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
-        <br/><br/>
-        <script>type_ans = '{{ test['type_answer'] }}'</script>
-        {% if test['type_answer'] == 'ch' %}
-            Choose one or more variant:<br/>
-            {% for i, ch in test['choice'] %}
-                <button class="btn btn-choice" id="ch-btn-{{ i }}"
-                onclick="add_ch({{ i }}, this)">{{ ch[0] }}</button>
-            {% endfor %}
-        {% else %}
-            <input type="text" placeholder="answer" id="answer-plain-text"
-                   name="answer" class="input-group-addon q-inp">
-        {% endif %}
-    <br/><div style="display: none" id="mark-block">
-        <p style="display: inline-block;">Вы получили за это задание </p>
-        <p style="display: inline-block;" id="how-many-give"></p>
-        <p style="display: inline-block;"> баллов</p></div>
-    <br/>
-    <input type="button" onclick="ok()" value="Ok!" id="ok-btn"
-           class="btn-info ok-btn float-right">
+        {{ feachers.view_test(
+            test, 'student_on_exam'
+        ) }}
+        <br/>
+        <div style="display: none" id="mark-block">
+            <p style="display: inline-block;">Вы получили за это задание </p>
+            <p style="display: inline-block;" id="how-many-give"></p>
+            <p style="display: inline-block;"> баллов</p></div>
+        <br/>
+        <input type="button" onclick="ok()" value="Ok!" id="ok-btn"
+               class="btn-info ok-btn float-right">
     </div>
 {% endblock %}

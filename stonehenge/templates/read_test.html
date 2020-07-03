@@ -10,28 +10,9 @@
 {% endblock %}
 {% block main %}
     <div class="container"><br/>
-        {{ test['querstion_txt'] }}
-        {% if test['question_bytes'] %}
-            <img class="ques-pic"
-                 src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
-        {% endif %}
-        <br/><br/>
-        <script>type_ans = '{{ test['type_answer'] }}'</script>
-        {% if test['type_answer'] == 'ch' %}
-            Choose one or more variant:<br/>
-            {% for i, ch in test['choice'] %}
-                <button class="btn btn-choice {{ 'correct' if ch[1] else 'incorrect' }}"
-                     id="ch-btn-{{ i }}" disabled
-                        onclick="add_ch({{ i }}, this)">{{ ch[0] }}</button>
-            {% endfor %}
-        {% else %}
-            <input type="text" value="{{ test['correct'] }}" id="answer-plain-text"
-                   name="answer" class="input-group-addon q-inp disabled" disabled>
-        {% endif %}
-        {% if mission == 'student' %}<br/>
-            Вы отвелили: {{ test['answer'] }}<br/>
-            Правильный ответ: {{ test['correct'] }}<br/>
-            Получено баллов: {{ test['point'] }} / 100<br/>
-        {% endif %}
+        {{ feachers.view_test(
+            test,
+            'teacher' if mission == 'teacher' else 'student_after_exam'
+        )}}
     </div>
 {% endblock %}

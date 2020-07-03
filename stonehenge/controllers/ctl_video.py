@@ -85,7 +85,25 @@ class VideoController:
     @staticmethod
     async def basic_view_video(vid, user_id, conn: SAConnection):
         return await (await conn.execute('''
-            select title, cloud_href, description,
+            select id, title, cloud_href, description,
             author=%s from app_video
             where id=%s
         ''', (user_id, vid))).fetchone()
+
+    @staticmethod
+    async def edit_info(vid, title, description, user_id,
+                        conn: SAConnection):
+        res = await (await conn.execute('''
+            with updated as (
+                update app_video
+                set title = %s, description = %s
+                where id = %s and author = %s
+                returning id
+            ) select count(*) from updated;
+        ''', (title, description, vid, user_id))).fetchone()
+
+        if not res[0]:
+            # not a author or video not found
+            return None, 'Video not found'
+        assert res[0] == 1
+        return True, 'Ok'

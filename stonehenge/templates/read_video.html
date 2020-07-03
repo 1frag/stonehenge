@@ -3,14 +3,54 @@
     <link href="/static/css/style_index.css" rel="stylesheet">
     <link href="/static/css/favorite.css" rel="stylesheet">
     <link href="/static/css/read_video.css" rel="stylesheet">
+    <script src="/static/js/edit_video_lecture.js"></script>
 {% endblock %}
 {% block title %}
     {{ video['title'] }}
 {% endblock %}
 {% block main %}
     <div class="container"><br/>
-        <h2>{{ video['title'] }}</h2><br/>
-        <video controls>
+        {{ feachers.error_div() }}
+        <h2 class="w-75 d-inline">{{ video['title'] or 'Без названия' }}</h2>
+        {% if video[4] %}
+            <button class="btn d-inline float-right" id="edit-title"
+                    type="button" data-toggle="modal"
+                    data-target="#modalChanger">
+                Исправить
+            </button>
+            <div class="modal fade" id="modalChanger" tabindex="-1" role="dialog"
+                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Изменить <b>{{ video['title'] }}</b></h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="edit-form">
+                                <input type="hidden" value="{{ video['id'] }}" name="v_id">
+                                <label for="title">Введите название</label>
+                                <input type="text" name="title" id="title" class="form-control"
+                                       placeholder="{{ video['title'] }}">
+                                <label for="description">Описание</label>
+                                <textarea class="form-control" id="description"
+                                          name="description" placeholder="{{ video['description'] }}"></textarea>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close-btn">Close</button>
+                            <button type="button" class="btn btn-primary"
+                                    onclick="sendEditInfo()">Save changes
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <video controls class="mt-4">
             <source src="{{ video['cloud_href'] }}"
                     type="video/mp4">
             Your browser does not support the video tag.
@@ -18,6 +58,5 @@
 
         <br/>
         <p>{{ video['description'] }}</p>
-        <p></p>
     </div>
 {% endblock %}

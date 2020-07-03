@@ -84,3 +84,19 @@ async def read_video(request: 'Request'):
         if video is None:
             raise web.HTTPNotFound()
     return {'video': video, **request.to_jinja}
+
+
+async def edit_video_info(request: 'Request'):
+    data = await request.post()
+    if not all(map(data.__contains__,
+                   ('title', 'description', 'v_id'))):
+        raise web.HTTPBadRequest()
+
+    async with request.app.db.acquire() as conn:
+        res, err = await request.app.video_ctrl.edit_info(
+            data['v_id'], data['title'], data['description'],
+            request.user.id, conn,
+        )
+        if res is None:
+            raise web.HTTPBadRequest(body=err)
+    return web.Response(status=200)

@@ -98,12 +98,26 @@ class VideoController:
                 update app_video
                 set title = %s, description = %s
                 where id = %s and author = %s
-                returning id
+                returning 1
             ) select count(*) from updated;
         ''', (title, description, vid, user_id))).fetchone()
 
         if not res[0]:
             # not a author or video not found
+            return None, 'Video not found'
+        assert res[0] == 1
+        return True, 'Ok'
+
+    @staticmethod
+    async def remove(vid, user_id, conn: SAConnection):
+        res = await (await conn.execute('''
+            with deleted as (
+                delete from app_video
+                where id = %s and author = %s
+                returning 1
+            ) select count(*) from deleted;
+        ''', (vid, user_id))).fetchone()
+        if not res[0]:
             return None, 'Video not found'
         assert res[0] == 1
         return True, 'Ok'

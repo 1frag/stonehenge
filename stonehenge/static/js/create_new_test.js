@@ -8,20 +8,20 @@ $(function () {
 let cur = 1;
 $(document).ready(function () {
     /*After click to plus -> add new row*/
-    let plus = $('#ca-plus-ans')[0]
-    plus.onclick = function () {
+    let plus = $('#ca-plus-ans')
+    plus.click(() => {
         $('#table-with-answers tr:last').after(
             '<tr id="row' + cur + '">\n' +
             '    <td><input type="text" style="width: 90%;" name="a' + cur + '"></td>\n' +
             '    <td><input type="checkbox" name="b' + cur + '" class="custom-checkbox"></td>\n' +
-            '    <td><button class="btn-danger" name="c' + cur + '">remove</button></td>\n' +
+            '    <td><button class="btn-danger" name="c' + cur + '">удалить</button></td>\n' +
             '</tr>'
         );
         let c = cur;
         $('[name=c' + cur + ']')[0].onclick = _ => $('#row' + c).remove();
         cur += 1;
-    };
-    [1, 2, 3].map(_ => plus.onclick());
+    });
+    [1, 2, 3].map(_ => plus.click());
     /* end */
 });
 

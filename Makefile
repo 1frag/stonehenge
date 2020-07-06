@@ -3,6 +3,7 @@ PYTHON=/home/ifrag/.pyenv/versions/3.8.3/bin/python
 
 # deploy to heroku via docker
 deploy:
+	heroku container:login
 	heroku container:push web
 	heroku container:release web
 

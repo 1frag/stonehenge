@@ -3,7 +3,7 @@
     <link href="/static/css/style_index.css" rel="stylesheet">
     <link href="/static/css/favorite.css" rel="stylesheet">
     <link href="/static/css/read_video.css" rel="stylesheet">
-    <script src="/static/js/edit_video_lecture.js"></script>
+    <script src="/static/js/ud_tests_ans_video.js"></script>
 {% endblock %}
 {% block title %}
     {{ video['title'] }}
@@ -13,12 +13,8 @@
         {{ feachers.error_div() }}
         <h2 class="w-75 d-inline">{{ video['title'] or 'Без названия' }}</h2>
         {% if video[4] %}
-            <button class="btn btn-danger d-inline float-right" id="edit-title"
-                    type="button" data-toggle="modal"
-                    data-target="#modalDeleter">
-                Удалить
-            </button>
-            <button class="btn btn-info d-inline float-right mr-2" id="edit-title"
+            {{ feachers.modal_for_delete('Видео', 'sendDeleteVideo', video['title']) }}
+            <button class="btn btn-info d-inline float-right mr-2"
                     type="button" data-toggle="modal"
                     data-target="#modalChanger">
                 Исправить
@@ -53,28 +49,7 @@
                     </div>
                 </div>
             </div>
-            <div class="modal fade" id="modalDeleter" tabindex="-1" role="dialog"
-                 aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="exampleModalLongTitle">Удалить <b>{{ video['title'] }}</b></h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <p>Видео удалится и восстановить его уже никогда не получится. Продолжаем удаление?</p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close-btn-del">Close</button>
-                            <button type="button" class="btn btn-danger"
-                                    onclick="sendDeleteVideo()">Удалить
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+
         {% endif %}
 
         <video controls class="mt-4">

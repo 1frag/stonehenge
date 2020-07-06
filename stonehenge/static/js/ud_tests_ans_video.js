@@ -1,3 +1,5 @@
+// this file contains crUD for tests and video lectures
+
 function sendEditInfo() {
     let formData = new FormData(document.forms['edit-form']);
     $.ajax({
@@ -16,7 +18,7 @@ function sendEditInfo() {
     })
 }
 
-function sendDeleteVideo() {
+function sendDeleteVideo() { // used by modal_for_delete
     $.ajax({
         url: '/video/remove',
         method: 'POST', // I am afraid to use DELETE method due to ajax specific
@@ -31,4 +33,21 @@ function sendDeleteVideo() {
         processData: false,
         contentType: false,
     })
+}
+
+function sendTestDelete() { // used by modal_for_delete
+    $.ajax({
+        url: '/tests/remove',
+        method: 'POST',
+        data: JSON.stringify({t_id: $('#test-id').val()}),
+        success: (r) => {
+            document.location.href = '/'
+        },
+        error: (r) => {
+            make('error', r.statusText, 'Ошибка удаления');
+            $('#close-btn-del').click()
+        },
+        processData: false,
+        contentType: false,
+    });
 }

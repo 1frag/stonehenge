@@ -189,6 +189,19 @@ class TestController:
         ''', (user_id,))).fetchall())
         return res
 
+    @staticmethod
+    async def remove(t_id, user_id, conn: SAConnection):
+        res = await (await conn.execute('''
+            with deleted as (
+                delete from app_tests
+                where id = %s and author = %s
+                returning 1
+            ) select count(*) from deleted;
+        ''', (t_id, user_id))).fetchone()
+        if not res[0]:
+            return None, 'Test not found'
+        return True, 'Ok'
+
 
 class UserMustSetLevel(Exception):
     pass

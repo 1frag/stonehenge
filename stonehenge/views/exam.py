@@ -138,3 +138,28 @@ async def exam_stats(request: 'Request'):
             if res is None:
                 raise web.HTTPNotFound()
             return {'res': res, **request.to_jinja}
+
+
+@aiohttp_jinja2.template('create_new_test.html')
+async def edit_test(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPFound('/')
+    return {}
+
+
+async def remove_test(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPForbidden()
+
+    data = await request.json()
+    if 't_id' not in data:
+        raise web.HTTPBadRequest()
+
+    async with request.app.db.acquire() as conn:
+        res, err = await request.app.test_ctrl.remove(
+            data['t_id'], request.user.id, conn,
+        )
+        if res is None:
+            raise web.HTTPBadRequest(body=err)
+
+    return web.Response(status=200)

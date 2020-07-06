@@ -33,6 +33,9 @@ async def test_check_user_table(conn: SAConnection):
 
 
 async def test_when_user_unauthorized(app, aiohttp_client):
+    # получение объекта клиента
     client = await aiohttp_client(app)
+    # выполнение web запроса
     resp = await client.get('/')
+    # проверка конечного адреса (после редиректов)
     assert resp.real_url.path == '/login'

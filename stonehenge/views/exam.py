@@ -140,13 +140,6 @@ async def exam_stats(request: 'Request'):
             return {'res': res, **request.to_jinja}
 
 
-@aiohttp_jinja2.template('create_new_test.html')
-async def edit_test(request: 'Request'):
-    if request.user is None:
-        raise web.HTTPFound('/')
-    return {}
-
-
 async def remove_test(request: 'Request'):
     if request.user is None:
         raise web.HTTPForbidden()

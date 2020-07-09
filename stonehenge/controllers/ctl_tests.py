@@ -77,12 +77,14 @@ class TestController:
             returning id;
         ''', (author, type_answer, correct, choice, question_txt,
               file_bytes, case_ins))).fetchone())[0]
-        await (await conn.execute('''
+        logger.info(f'{levels=}')
+        ids = await (await conn.execute('''
             insert into app_tests_levels (test_id, level_id)
             select %s, id as level_id from app_levels
             where name = any (%s)
             returning id;
         ''', (test_id, levels))).fetchall()
+        logger.info(f'{ids=}')
         return test_id
 
     async def get_next_test(self, user_id: int, conn: SAConnection):

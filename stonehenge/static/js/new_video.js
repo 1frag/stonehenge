@@ -32,7 +32,6 @@ async function ok_btn() {
         }),
         method: 'POST',
     }).then(async function (r) {
-        return;
         document.location.href = '/video/' + await r.text();
     });
 }

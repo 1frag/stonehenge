@@ -46,7 +46,6 @@ def init_routes(app: 'Application') -> None:
     add_route('GET', '/tests/exam', views.exam.exam_test_get)
     add_route('POST', '/tests/exam', views.exam.exam_test_post)
     add_route('GET', '/tests/stats', views.exam.exam_stats)
-    add_route('POST', '/tests/edit', views.exam.edit_test)
     add_route('POST', '/tests/remove', views.exam.remove_test)
 
     add_route('GET', '/video/new', views.video.new_video_get)

@@ -9,7 +9,7 @@
 {% endblock %}
 {% block main %}
     <div class="container">
-        <form id="creating-form" onsubmit="createSubmit(this)" method="post">
+        <form id="creating-form" method="post">
             {{ feachers.error_div() }}
             <div class="col-6 txt-pretty"><br/>
                 <h3 class="h3">Вопрос:</h3>
@@ -57,15 +57,10 @@
                 </div>
                 <br/>
                 {{ feachers.levels_for_form(levels) }}
-                <input type="submit" value="Создать" class="btn"
+                <input type="button" value="Создать" class="btn"
+                       onclick="createSubmit(this)"
                        style="margin: 30px; padding: 15px; background-color: #33333344">
             </div>
         </form>
     </div>
-    {% if to_edit %}
-        <script>
-            $('[name=question_txt]').val({{ test['question_txt'] or '' }});
-            $('')
-        </script>
-    {% endif %}
 {% endblock %}

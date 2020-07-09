@@ -170,7 +170,14 @@ create table app_video (
     cloud_href text not null, -- https://cloud.../...
     title varchar(128) not null,
     description text,
-    author int references app_users(id) on delete set null
+    author int references app_users(id) on delete set null,
+);
+
+create table app_views (
+    id serial primary key,
+    student int references app_users(id) on delete set null,
+    video_id int references app_video(id) on delete cascade,
+    how_many int default 0 not null
 );
 
 create table app_video_levels (

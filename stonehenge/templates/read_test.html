@@ -8,6 +8,7 @@
 {% endblock %}
 {% block main %}
     <div class="container"><br/>
+        <input type="hidden" id="test-id" value="{{ test['id'] }}">
         {{ feachers.error_div() }}
         {{ feachers.view_test(
             test,
@@ -16,10 +17,6 @@
         {% if mission == 'teacher' %}
             {{ feachers.modal_for_delete('Тест', 'sendTestDelete',
                     'Тест #' + (test["id"] | string)) }}
-            <button class="btn btn-info d-inline float-right mr-2"
-                    type="button">
-                Исправить
-            </button>
         {% endif %}
     </div>
 {% endblock %}

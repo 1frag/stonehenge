@@ -56,20 +56,23 @@ class VideoController:
             self, name, title, href, levels,
             desc, author, conn: SAConnection
     ):
-        video_id = await (await conn.execute('''
+        video_id = (await (await conn.execute('''
             insert into app_video (
                 cloud_path, cloud_href, title,
                 description, author
             )
             values (%s, %s, %s, %s, %s)
             returning id;
-        ''', (self._path_on_disk + name, href, title, desc, author))
-                          ).fetchone()
-        await conn.execute('''
-            insert into app_tests_levels (test_id, level_id)
+        ''', (self._path_on_disk + name, href, title,
+              desc, author))).fetchone())[0]
+        logger.info(f'{levels=}')
+        ids = await (await conn.execute('''
+            insert into app_video_levels (video_id, level_id)
             select %s, id as level_id from app_levels
-            where name = any (%s);
-        ''', (video_id, levels))
+            where name = any (%s)
+            returning id;
+        ''', (video_id, levels))).fetchall()
+        logger.info(f'{ids=}')
         return video_id
 
     async def create_new(self, title, video_file, levels, description,

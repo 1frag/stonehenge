@@ -118,3 +118,17 @@ async def remove_video(request: 'Request'):
         if res is None:
             raise web.HTTPNotFound(body=err)
     return web.Response(status=200)
+
+
+async def stats_video(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPForbidden()
+
+    async with request.app.db.acquire() as conn:
+        data = request.app.video_ctrl.get_stats(
+            request.user.mission,
+            request.user.id, conn,
+        )
+    return {
+        **data, **request.to_jinja,
+    }

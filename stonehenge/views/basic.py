@@ -17,12 +17,9 @@ async def index(request: 'Request') -> Dict[str, str]:
         raise web.HTTPFound('/login')
 
     async with request.app.db.acquire() as conn:
-        data = {'login': request.user.login,
-                'mission': request.user.mission}
-        if request.user.mission == 'teacher':
-            data.update(await prepare_index_page_for_teacher(conn, request.user.id))
+        data = await prepare_index_page(conn, request.user.id)
     logger.debug('%s on page /', request.user)
-    return data
+    return {**data, **request.to_jinja}
 
 
 @aiohttp_jinja2.template('profile.html')
@@ -33,12 +30,12 @@ async def profile_view(request: 'Request'):
     async with request.app.db.acquire() as conn:
         levels = await (
             await conn.execute('''
-            select name, id=%s as current from app_levels order by force;
+                select name, id=%s as current from app_levels
+                order by force;
             ''', (request.user.level,))
         ).fetchall()  # todo: there something wrong: current not parsed by sqlalchemy
 
-    return {'mission': request.user.mission,
-            'levels': levels}
+    return {'levels': levels, **request.to_jinja}
 
 
 async def profile_save(request: 'Request'):
@@ -56,17 +53,17 @@ async def profile_save(request: 'Request'):
         changed |= 1
         async with request.app.db.acquire() as conn:
             await conn.execute('''
-            with cur_level as (
-                select l.id from app_levels l
-                where name=%s limit 1
-            ), cur_user as (
-                select u.student_meta_id as uid from app_users u
-                where id=%s limit 1
-            )
-            update app_student_meta sm
-            set level_id = cur_level.id
-            from cur_level, cur_user
-            where sm.id=cur_user.uid
+                with cur_level as (
+                    select l.id from app_levels l
+                    where name=%s limit 1
+                ), cur_user as (
+                    select u.student_meta_id as uid from app_users u
+                    where id=%s limit 1
+                )
+                update app_student_meta sm
+                set level_id = cur_level.id
+                from cur_level, cur_user
+                where sm.id=cur_user.uid
             ''', (data['new_level'], request.user.id))
 
     logger.debug('%s fileds has been changed', changed)

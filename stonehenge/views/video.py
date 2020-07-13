@@ -83,6 +83,10 @@ async def read_video(request: 'Request'):
         )
         if video is None:
             raise web.HTTPNotFound()
+        if request.user.mission == 'mission':
+            await request.app.video_ctrl.watched_by_student(
+                vid, request.user.id, conn
+            )
     return {'video': video, **request.to_jinja}
 
 
@@ -120,15 +124,14 @@ async def remove_video(request: 'Request'):
     return web.Response(status=200)
 
 
+@aiohttp_jinja2.template('video_stats.html')
 async def stats_video(request: 'Request'):
     if request.user is None:
         raise web.HTTPForbidden()
 
     async with request.app.db.acquire() as conn:
-        data = request.app.video_ctrl.get_stats(
+        data = await request.app.video_ctrl.get_stats(
             request.user.mission,
             request.user.id, conn,
         )
-    return {
-        **data, **request.to_jinja,
-    }
+        return {'data': data, **request.to_jinja}

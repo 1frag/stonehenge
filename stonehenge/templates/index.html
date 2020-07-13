@@ -12,7 +12,7 @@
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#" onclick="tests()">Тесты</a></h5>
+                    <h5 class="card-title">Тесты</h5>
                     <p class="card-text">Здесь вы можете создавать новые тесты
                     и смотреть за их статистикой</p>
                     <p>создано {{ created_tests }} тестов
@@ -24,7 +24,7 @@
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d9945066">
-                    <h5 class="card-title"><a href="#">Тренировочные видео</a></h5>
+                    <h5 class="card-title">Тренировочные видео</h5>
                     <p class="card-text">Здесь вы можете загружать новые
                     обучающие видео или смотреть их статистику</p>
                     <p>создано {{ created_video }} видео
@@ -36,53 +36,50 @@
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#">Video calls with students</a></h5>
-                    <p class="card-text">Here you can call students or find them</p>
-                </div>
-            </div>
-            <div class="card custom-card my-btn">
-                <div class="card-body custom-card-body radius-able"
-                     style="background-color: #d9945066">
-                    <h5 class="card-title"><a href="#">Writing</a></h5>
-                    <p class="card-text">Here you can check student work
-                        and add tasks</p>
+                    <h5 class="card-title">Трансляции</h5>
+                    <p class="card-text">Здесь вы можете запустить трансляцию
+                        урока</p>
+                    <p><a href="/webinars/start">Как начать?</a></p>
+                    <p><a href="/webinars/current">Текущая трансляция</a></p>
+                    <p><a href="/webinars/all">Все трасляции</a></p>
                 </div>
             </div>
         {% elif mission == 'student' %}
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#" onclick="tests()">Tests</a></h5>
-                    <p class="card-text">Here you can pass tests
-                        and follow their statistics</p>
-                    <p>{{ created_tests }} tests created
-                        <a href="/tests/exam">(start testing)</a></p>
-                    <p>{{ sol_received }} solutions received
-                        <a href="/tests/stats">(see stats)</a></p>
+                    <h5 class="card-title">Тесты</h5>
+                    <p class="card-text">Тесты тренируют грамматику иностранного языка</p>
+                    <p><a href="/tests/exam">Начать решать</a></p>
+                    {% if sol_received %}
+                        <p>Уже {{ sol_received }} решено
+                        <a href="/tests/stats">(Смотреть статистику)</a></p>
+                    {% else %}
+                        Пока что вы не решали тесты
+                    {% endif %}
                 </div>
             </div>
-            {# todo: other block don't follow real description #}
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d9945066">
-                    <h5 class="card-title"><a href="#">Training videos</a></h5>
-                    <p class="card-text">Here you can upload training
-                        videos and follow their statistics</p>
+                    <h5 class="card-title">Обучающие видео</h5>
+                    <p class="card-text">Видео нацелены на улучшение
+                        умения понимать иностранную речь</p>
+                    <p><a href="/video/stats">К списку видео</a></p>
                 </div>
             </div>
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#">Video calls with students</a></h5>
-                    <p class="card-text">Here you can call students or find them</p>
-                </div>
-            </div>
-            <div class="card custom-card my-btn">
-                <div class="card-body custom-card-body radius-able"
-                     style="background-color: #d9945066">
-                    <h5 class="card-title"><a href="#">Writing</a></h5>
-                    <p class="card-text">Here you can check student work
-                        and add tasks</p>
+                    <h5 class="card-title">Видеозвонки с преподавателями</h5>
+                    <p class="card-text">Видеозвонки помогут вам освоить
+                        определенную тему</p>
+                    <p><a href="/webinars/invite">Создать заявку на занятие</a></p>
+                    {% if webinar_soon %}
+                        <p><a href="/webinars">Перейти к расписанию</a></p>
+                    {% else %}
+                        <p>Ближайших встреч нет</p>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}

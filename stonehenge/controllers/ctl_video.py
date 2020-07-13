@@ -94,6 +94,12 @@ class VideoController:
         ''', (user_id, vid))).fetchone()
 
     @staticmethod
+    async def watched_by_student(vid, user_id, conn: SAConnection):
+        await conn.execute('''
+            select watched_by_student(%s, %s);
+        ''', (vid, user_id))
+
+    @staticmethod
     async def edit_info(vid, title, description, user_id,
                         conn: SAConnection):
         res = await (await conn.execute('''
@@ -124,3 +130,20 @@ class VideoController:
             return None, 'Video not found'
         assert res[0] == 1
         return True, 'Ok'
+
+    @staticmethod
+    async def get_stats(mission, user_id, conn: SAConnection):
+        if mission == 'teacher':
+            return await (await conn.execute('''
+                select * from app_video
+                where author = %s
+            ''', (user_id, ))).fetchall()
+        elif mission == 'student':
+            return await (await conn.execute('''
+                select video.*,
+                       views.id as watched
+                from app_video video
+                left join app_views views on views.video_id = video.id
+                where views.student =2 or views.id is null
+                order by watched;
+            ''', (user_id, ))).fetchall()

@@ -22,6 +22,26 @@ create table app_student_meta (
     level_id int references app_levels(id) on delete set null
 );
 
+create or replace function random_text(length int)
+    returns text
+as $$
+declare
+    output text := '';
+    fl int := ceil(length::float / 32);
+begin
+    for i in 1..fl loop
+        output := output || md5(random()::text);
+    end loop;
+    return upper(substring(output, 1, length));
+end;
+$$ language plpgsql;
+
+create table app_teacher_meta (
+    id serial primary key,
+    stream_key varchar(64) default random_text(64),
+    online bool default false
+);
+
 create table app_users (
     id serial primary key,
     login varchar(32) not null,
@@ -33,7 +53,8 @@ create table app_users (
     google_id decimal references app_google_users(google_id) on delete set null,
     vk_id decimal references app_vk_users(vk_id) on delete set null,
     auth_type auth_type not null,
-    student_meta_id int references app_student_meta(id) on delete set null
+    student_meta_id int references app_student_meta(id) on delete set null,
+    teacher_meta_id int references app_teacher_meta(id) on delete set null
 );
 
 create table app_tests (
@@ -106,6 +127,7 @@ $$
 declare
     cur_auth_type auth_type = null;
     student_meta int = null;
+    teacher_meta int = null;
     result int;
 begin
     if google_user is not null then
@@ -123,14 +145,19 @@ begin
     if cur_mission = 'student'::user_mission then
         insert into app_student_meta
         default values returning id into student_meta;
+    elseif cur_mission = 'teacher'::user_mission then
+        insert into app_teacher_meta
+        default values returning id into teacher_meta;
     end if;
 
     insert into app_users (login, first_name, last_name,
                            email, google_id, vk_id, mission,
-                           auth_type, password, student_meta_id)
+                           auth_type, password, student_meta_id,
+                           teacher_meta_id)
     values (cur_login, cur_first_name, cur_last_name,
             cur_email, google_user, vk_user, cur_mission,
-            cur_auth_type, cur_password, student_meta)
+            cur_auth_type, cur_password, student_meta,
+            teacher_meta)
     returning id into result;
 
     return result;
@@ -170,7 +197,8 @@ create table app_video (
     cloud_href text not null, -- https://cloud.../...
     title varchar(128) not null,
     description text,
-    author int references app_users(id) on delete set null
+    author int references app_users(id) on delete set null,
+    created_at date default now()::date
 );
 
 create table app_views (

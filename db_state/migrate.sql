@@ -173,6 +173,13 @@ create table app_video (
     author int references app_users(id) on delete set null
 );
 
+create table app_views (
+    id serial primary key,
+    student int references app_users(id) on delete set null,
+    video_id int references app_video(id) on delete cascade,
+    how_many int default 0 not null
+);
+
 create table app_video_levels (
     id serial primary key,
     video_id int references app_video(id) on delete cascade,

@@ -84,3 +84,51 @@ async def read_video(request: 'Request'):
         if video is None:
             raise web.HTTPNotFound()
     return {'video': video, **request.to_jinja}
+
+
+async def edit_video_info(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPForbidden()
+    data = await request.post()
+    if not all(map(data.__contains__,
+                   ('title', 'description', 'v_id'))):
+        raise web.HTTPBadRequest()
+
+    async with request.app.db.acquire() as conn:
+        res, err = await request.app.video_ctrl.edit_info(
+            data['v_id'], data['title'], data['description'],
+            request.user.id, conn,
+        )
+        if res is None:
+            raise web.HTTPBadRequest(body=err)
+    return web.Response(status=200)
+
+
+async def remove_video(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPForbidden()
+    data = await request.json()
+    if 'v_id' not in data:
+        raise web.HTTPBadRequest()
+
+    async with request.app.db.acquire() as conn:
+        res, err = await request.app.video_ctrl.remove(
+            data['v_id'], request.user.id, conn,
+        )
+        if res is None:
+            raise web.HTTPNotFound(body=err)
+    return web.Response(status=200)
+
+
+async def stats_video(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPForbidden()
+
+    async with request.app.db.acquire() as conn:
+        data = request.app.video_ctrl.get_stats(
+            request.user.mission,
+            request.user.id, conn,
+        )
+    return {
+        **data, **request.to_jinja,
+    }

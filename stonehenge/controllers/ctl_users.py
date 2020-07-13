@@ -125,9 +125,23 @@ async def prepare_index_page_for_teacher(conn: SAConnection, user_id: int):
     where t.author = %s;
     ''', (user_id,))).fetchone())[0]
 
+    # get count of created video
+    created_video = (await (await conn.execute('''
+        select count(*) from app_video v
+        where v.author = %s''', (user_id,))).fetchone())[0]
+
+    # get count of solution received
+    watched = (await (await conn.execute('''
+        select count(*) from app_views viw
+        left join app_video vid on viw.video_id = vid.id
+        where vid.author=%s;
+        ''', (user_id,))).fetchone())[0]
+
     return {
         'created_tests': created_tests,
         'sol_received': sol_received,
+        'created_video': created_video,
+        'watched': watched,
     }
 
 

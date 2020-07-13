@@ -76,16 +76,16 @@ async def exam_test_get(request: 'Request'):
             raise web.HTTPFound('/profile?set_up_level')
         if data is None:
             return aiohttp_jinja2.render_template(
-                'error.html', request, {'error': 'there is no tests'}
+                'error.html', request, {'error': 'there is no test'}
             )
         test = await (await conn.execute('''
-        select * from app_tests
-        where id = %s''', data)).fetchone()
+            select * from app_tests
+            where id = %s''', data)).fetchone()
         if test is None:
             raise web.HTTPFound('/?no-more-tests')
 
         test = request.app.test_ctrl.precalc_test_before_show(test)
-        return {'test': test}
+        return {'test': test, **request.to_jinja}
 
 
 async def exam_test_post(request: 'Request'):
@@ -138,3 +138,21 @@ async def exam_stats(request: 'Request'):
             if res is None:
                 raise web.HTTPNotFound()
             return {'res': res, **request.to_jinja}
+
+
+async def remove_test(request: 'Request'):
+    if request.user is None:
+        raise web.HTTPForbidden()
+
+    data = await request.json()
+    if 't_id' not in data:
+        raise web.HTTPBadRequest()
+
+    async with request.app.db.acquire() as conn:
+        res, err = await request.app.test_ctrl.remove(
+            data['t_id'], request.user.id, conn,
+        )
+        if res is None:
+            raise web.HTTPBadRequest(body=err)
+
+    return web.Response(status=200)

@@ -4,6 +4,7 @@ services:
 
   app: &app
     tty: true
+    container_name: app
     build:
       context: .
       args:
@@ -25,11 +26,11 @@ services:
     networks:
       stonetwork:
         aliases:
-          - local.app.stonehenge
+          - app
 
   postgres:
     image: postgres:11
-    container_name: stonehenge_postgres
+    container_name: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -50,14 +51,17 @@ services:
     command: ''
 
   nginx:
-    image: nginx:mainline-alpine
-    container_name: "stonehenge_nginx"
+    build:
+      context: nginx
+    container_name: nginx
     depends_on:
       - app
     ports:
       - "8080:8080"
+      - "1935:1935"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./nginx/default.conf:/etc/nginx/nginx.conf
       - ./stonehenge/static:/usr/share/nginx/static
     networks:
       stonetwork:
@@ -66,6 +70,7 @@ services:
 
   redis:
     image: "redis:alpine"
+    container_name: redis
     command: redis-server --requirepass redis
     ports:
       - "6379:6379"

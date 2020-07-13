@@ -12,6 +12,10 @@ async function upload_big_file(target, url, n) {
 
         reader = new FileReader();
         file = document.querySelector(target).files[0];
+        if (file === undefined) {
+            make('error', 'Укажите файл');
+            return;
+        }
         upload_file(0);
 
         function upload_file(start) {

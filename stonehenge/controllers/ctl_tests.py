@@ -77,12 +77,14 @@ class TestController:
             returning id;
         ''', (author, type_answer, correct, choice, question_txt,
               file_bytes, case_ins))).fetchone())[0]
-        await (await conn.execute('''
+        logger.info(f'{levels=}')
+        ids = await (await conn.execute('''
             insert into app_tests_levels (test_id, level_id)
             select %s, id as level_id from app_levels
             where name = any (%s)
             returning id;
         ''', (test_id, levels))).fetchall()
+        logger.info(f'{ids=}')
         return test_id
 
     async def get_next_test(self, user_id: int, conn: SAConnection):
@@ -188,6 +190,19 @@ class TestController:
             where m.solver=%s;
         ''', (user_id,))).fetchall())
         return res
+
+    @staticmethod
+    async def remove(t_id, user_id, conn: SAConnection):
+        res = await (await conn.execute('''
+            with deleted as (
+                delete from app_tests
+                where id = %s and author = %s
+                returning 1
+            ) select count(*) from deleted;
+        ''', (t_id, user_id))).fetchone()
+        if not res[0]:
+            return None, 'Test not found'
+        return True, 'Ok'
 
 
 class UserMustSetLevel(Exception):

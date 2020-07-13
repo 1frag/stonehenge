@@ -1,7 +1,6 @@
 {% extends 'base.html' %}
 {% block other_in_head %}
-    <link href="/static/css/style_index.css" rel="stylesheet">
-    <script src="/static/js/script_index.js"></script>
+    <link href="/static/css/style_index.css" rel="stylesheet" type="text/css">
 {% endblock %}
 {% block title %}
     Start page
@@ -30,7 +29,7 @@
                     обучающие видео или смотреть их статистику</p>
                     <p>создано {{ created_video }} видео
                         <a href="/video/new">(создать новое)</a></p>
-                    <p>{{ watched }} минут просмотров
+                    <p>{{ watched }} просмотров
                         <a href="/video/stats">(смотреть статистику)</a></p>
                 </div>
             </div>
@@ -89,5 +88,4 @@
         {% endif %}
 
     </div>
-    <script src="/static/js/uploader.ts"></script>
 {% endblock %}

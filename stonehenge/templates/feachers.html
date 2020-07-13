@@ -44,7 +44,7 @@
 {%- endmacro -%}
 
 {%- macro levels_for_form(levels) -%}
-    <h4>Level:</h4>
+    <h3 class="h3">Уровень:</h3>
     {% for i, l in levels %}
         <div class="form-check">
             <input class="form-check-input" type="checkbox"
@@ -54,4 +54,82 @@
             </label>
         </div>
     {% endfor %}
+{%- endmacro -%}
+
+{%- macro view_test(test, show_for) -%}
+    {# show_as must be in ['teacher', 'student_on_exam', 'student_after_exam'] #}
+    <h3>{{ test['question_txt'] }}</h3>
+    {% if test['question_bytes'] %}
+        <img class="ques-pic"
+             src="data:image/png;base64, {{ test['question_bytes'].rstrip().decode() }}" alt="some img"/>
+    {% endif %}
+    <link href="/static/css/exam_test.css" rel="stylesheet">
+    <script src="/static/js/exam_test.js"></script>
+    <script>type_ans = '{{ test['type_answer'] }}'</script>
+
+    {% if test['type_answer'] == 'ch' %}
+        {{ 'Выбирете' if show_for == 'student_on_exam' else 'Требуется выбрать' }}
+        один или более вариантов:<br/>
+        {% for i, ch in test['choice'] %}
+            <button class="btn btn-choice" id="ch-btn-{{ i }}">{{ ch[0] }}</button>
+            <script>
+                var cur_btn = $('#ch-btn-{{ i }}');
+                {% if show_for == 'student_on_exam' %}
+                    {# только на экзамене добавляем реакцию на нажатие #}
+                    cur_btn.click(() => add_ch({{ i }}, '#ch-btn-{{ i }}'));
+                {% else %}
+                    {# иначе подсветим правильность этого варианта #}
+                    cur_btn.addClass('{{ 'correct' if ch[1] else 'incorrect' }}');
+                {% endif %}
+            </script>
+        {% endfor %}
+    {% else %}
+        {% if show_for == 'student_on_exam' %}
+            <label for="answer-plain-text">Введите ответ на вопрос.</label>
+            <input type="text" value="{{ test['correct'] }}"
+                   id="answer-plain-text" name="answer" class="input-group-addon q-inp">
+        {% else %}
+            Правильный ответ: {{ test['correct'] }}<br/>
+        {% endif %}
+    {% endif %}
+
+    {% if show_for == 'student_after_exam' %}<br/>
+        Вы отвелили: {{ test['answer'] }}<br/>
+        Получено баллов: {{ test['point'] }} / 100<br/>
+    {% else %}
+
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro modal_for_delete(what, on_delete, title) -%}
+    <script src="/static/js/ud_tests_ans_video.js"></script>
+    <button class="btn btn-danger d-inline float-right"
+            type="button" data-toggle="modal"
+            data-target="#modalDeleter">
+        Удалить
+    </button>
+
+    <div class="modal fade" id="modalDeleter" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Удалить <b>{{ title }}</b></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>{{ what }} удалится и восстановить его уже никогда не получится. Продолжаем удаление?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" id="close-btn-del">Close
+                    </button>
+                    <button type="button" class="btn btn-danger"
+                            onclick="{{ on_delete }}()">Удалить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 {%- endmacro -%}

@@ -124,3 +124,17 @@ class VideoController:
             return None, 'Video not found'
         assert res[0] == 1
         return True, 'Ok'
+
+    @staticmethod
+    async def get_stats(mission, user_id, conn: SAConnection):
+        if mission == 'teacher':
+            return await (await conn.execute('''
+                select * from app_video
+                where author = %s
+            ''', (user_id, ))).fetchall()
+        elif mission == 'student':
+            return await (await conn.execute('''
+                select video.* from app_views views
+                inner join app_video video on views.video_id = video.id
+                where views.student=%s
+            '''))

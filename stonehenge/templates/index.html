@@ -36,8 +36,15 @@
             <div class="card custom-card my-btn">
                 <div class="card-body custom-card-body radius-able"
                      style="background-color: #d1bd4766">
-                    <h5 class="card-title"><a href="#">Video calls with students</a></h5>
-                    <p class="card-text">Here you can call students or find them</p>
+                    <h5 class="card-title"><a href="#">Видезвонки со студентами</a></h5>
+                    <p class="card-text">Здесь вы можете назначать встречи ученикам
+                            и проводить вебинары</p>
+                    <p><a href="/webinars">создать новую встречу</a></p>
+                    {% if webinar_soon %}
+                        <p><a href="/webinars">Перейти к расписанию вебинаров</a></p>
+                    {% else %}
+                        <p>Ближайших встреч нет</p>
+                    {% endif %}
                 </div>
             </div>
             <div class="card custom-card my-btn">

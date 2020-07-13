@@ -55,7 +55,7 @@ def init_routes(app: 'Application') -> None:
     add_route('GET', r'/video/{video_id:\d+}', views.video.read_video)
     add_route('POST', '/video/edit', views.video.edit_video_info)
     add_route('POST', '/video/remove', views.video.remove_video)
-    add_route('POST', '/video/stats', views.video.stats_video)
+    add_route('GET', '/video/stats', views.video.stats_video)
 
     add_route('*', '/lectures', views.lectures.streaming)
 

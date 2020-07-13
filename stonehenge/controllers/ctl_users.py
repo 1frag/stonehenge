@@ -14,9 +14,9 @@ logger = logging.getLogger(__name__)
 class UserInformation:
     __slots__ = ('id', 'login', 'mission', 'level')
     query = '''
-    select u.*, sm.level_id as level from app_users u
-    left join app_student_meta sm on u.student_meta_id = sm.id
-    where u.id = %s;
+        select u.*, sm.level_id as level from app_users u
+        left join app_student_meta sm on u.student_meta_id = sm.id
+        where u.id = %s;
     '''
 
     def __init__(self, row_db):
@@ -64,19 +64,20 @@ async def create_user(
     if google_user or vk_user:
         trans = None
         try:
-            trans = await conn.begin()  # type: Optional[RootTransaction]
+            trans: 'Optional[aiopg.Transaction]' = await conn.begin()
             res = await conn.execute('''
-            select create_new_user(
-                %s, -- cur_login
-                %s, -- cur_email
-                %s, -- cur_first_name
-                %s, -- cur_last_name
-                %s, -- cur_mission
-                %s, -- cur_password
-                %s, -- google_user
-                %s -- vk_user
-            );''', (login, email, first_name, last_name, mission,
-                    password, google_user, vk_user))  # type: ResultProxy
+                select create_new_user(
+                    %s, -- cur_login
+                    %s, -- cur_email
+                    %s, -- cur_first_name
+                    %s, -- cur_last_name
+                    %s, -- cur_mission
+                    %s, -- cur_password
+                    %s, -- google_user
+                    %s -- vk_user
+                );
+            ''', (login, email, first_name, last_name, mission,
+                  password, google_user, vk_user))  # type: ResultProxy
             ret_id = await res.fetchone()  # type: RowProxy
             await trans.commit()
             return ret_id[0]
@@ -95,8 +96,8 @@ async def create_user(
 
 async def get_user_by_google(conn: SAConnection, google_user_id: int):
     return (await (await conn.execute('''
-    select id from app_users
-    where google_id = %s;
+        select id from app_users
+        where google_id = %s;
     ''', (google_user_id,))).fetchone())[0]
 
 
@@ -112,30 +113,32 @@ async def remember_user(request: 'Request', user_id: int):
     session['user_id'] = user_id
 
 
-async def prepare_index_page_for_teacher(conn: SAConnection, user_id: int):
+async def prepare_index_page(conn: SAConnection, user_id: int):
     # get count of created tests
     created_tests = (await (await conn.execute('''
-    select count(*) from app_tests t
-    where t.author = %s''', (user_id,))).fetchone())[0]
+        select count(*) from app_tests t
+        where t.author = %s
+    ''', (user_id,))).fetchone())[0]
 
     # get count of solution received
     sol_received = (await (await conn.execute('''
-    select count(*) from app_marks
-    inner join app_tests t on app_marks.test = t.id
-    where t.author = %s;
+        select count(*) from app_marks m
+        inner join app_tests t on m.test = t.id
+        where m.solver = %s;
     ''', (user_id,))).fetchone())[0]
 
     # get count of created video
     created_video = (await (await conn.execute('''
         select count(*) from app_video v
-        where v.author = %s''', (user_id,))).fetchone())[0]
+        where v.author = %s
+    ''', (user_id,))).fetchone())[0]
 
     # get count of solution received
     watched = (await (await conn.execute('''
         select count(*) from app_views viw
         left join app_video vid on viw.video_id = vid.id
         where vid.author=%s;
-        ''', (user_id,))).fetchone())[0]
+    ''', (user_id,))).fetchone())[0]
 
     return {
         'created_tests': created_tests,
@@ -149,7 +152,7 @@ async def get_levels(conn: SAConnection):  # todo: transport to other file
     return list(await (await conn.execute('''
         select name from app_levels
         order by force;
-        ''')).fetchall())
+    ''')).fetchall())
 
 
 class AlreadyRegistered(Exception):

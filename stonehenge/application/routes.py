@@ -57,7 +57,12 @@ def init_routes(app: 'Application') -> None:
     add_route('POST', '/video/remove', views.video.remove_video)
     add_route('GET', '/video/stats', views.video.stats_video)
 
-    add_route('*', '/lectures', views.lectures.streaming)
+    add_route('GET', '/webinars/start', views.webinars.start)
+    add_route('GET', '/webinars/current', views.webinars.current)
+    add_route('GET', r'/webinars/{w_id:\d+}', views.webinars.watch)
+    add_route('GET', r'/webinars/all', views.webinars.get_all)
+
+    add_route('*', r'/nginx/_callbacks/{cmd:.*}', views.webinars.nginx_callback)
 
     # added static dir
     static = PROJECT_PATH / '..' / 'static'

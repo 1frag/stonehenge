@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+{% block other_in_head %}
+    <link href="/static/css/style_index.css" rel="stylesheet">
+    <link href="/static/css/favorite.css" rel="stylesheet">
+{% endblock %}
+{% block title %}
+    Вебинары
+{% endblock %}
+{% block main %}
+    <div class="container"><br/>
+        <div class="col-12" style="font-size: 24px">
+            <div class="list-group">
+                <div class="list-group-item list-group-item-action">
+                    Ваш ключ: <input type="password" disabled id="key" value="{{ key }}">
+                    <input class="btn btn-info" value="Копировать"
+                           onclick="copy()" type="button">
+                    <input class="btn btn-warning" value="Показать"
+                           onclick="show()" type="button" id="show">
+                </div>
+                <div class="list-group-item list-group-item-action">
+                    Для стриминга можете использовать программу
+                    <a href="https://obsproject.com/ru/download">OBS</a>
+                </div>
+                <div class="list-group-item list-group-item-action">
+                    Подключитесь к нашему серверу:<br/>
+                    <img src="/static/images/obs_settings.jpg"
+                         height="162">
+                </div>
+                <div class="list-group-item list-group-item-action">
+                    Готово!
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function copy() {
+            navigator.clipboard.writeText('{{ key }}');
+            document.execCommand("copy");
+        }
+
+        function show() {
+            let t = $('#key')[0];
+            if (t.type === 'password') {
+                t.type = 'text';
+                $('#show')[0].value = 'Скрыть';
+            } else {
+                t.type = 'password';
+                $('#show')[0].value = 'Показать';
+            }
+        }
+    </script>
+{% endblock %}

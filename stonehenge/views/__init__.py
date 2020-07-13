@@ -5,5 +5,5 @@ from . import (
     exam,
     auth,
     video,
-    lectures,
+    webinars,
 )

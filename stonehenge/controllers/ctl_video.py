@@ -94,6 +94,12 @@ class VideoController:
         ''', (user_id, vid))).fetchone()
 
     @staticmethod
+    async def watched_by_student(vid, user_id, conn: SAConnection):
+        await conn.execute('''
+            select watched_by_student(%s, %s);
+        ''', (vid, user_id))
+
+    @staticmethod
     async def edit_info(vid, title, description, user_id,
                         conn: SAConnection):
         res = await (await conn.execute('''
@@ -134,7 +140,10 @@ class VideoController:
             ''', (user_id, ))).fetchall()
         elif mission == 'student':
             return await (await conn.execute('''
-                select video.* from app_views views
-                inner join app_video video on views.video_id = video.id
-                where views.student=%s
-            '''))
+                select video.*,
+                       views.id as watched
+                from app_video video
+                left join app_views views on views.video_id = video.id
+                where views.student =2 or views.id is null
+                order by watched;
+            ''', (user_id, ))).fetchall()

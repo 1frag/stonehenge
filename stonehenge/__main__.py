@@ -20,8 +20,10 @@ def main() -> None:
         )
 
     elif sys.argv[1] == 'migrate':
-        with open('/app/db_state/migrate.sql') as f:
+        with open('/app/db_state/renew.sql') as f:
             sql = f.read()
+        with open('/app/db_state/migrate.sql') as f:
+            sql = '\n\n\n'.join([sql, f.read()])
 
         async def async_func():
             db_state = database(app)

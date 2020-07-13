@@ -83,6 +83,10 @@ async def read_video(request: 'Request'):
         )
         if video is None:
             raise web.HTTPNotFound()
+        if request.user.mission == 'mission':
+            await request.app.video_ctrl.watched_by_student(
+                vid, request.user.id, conn
+            )
     return {'video': video, **request.to_jinja}
 
 

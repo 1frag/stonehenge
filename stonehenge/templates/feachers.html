@@ -57,7 +57,7 @@
 {%- endmacro -%}
 
 {%- macro view_test(test, show_for) -%}
-    {# show_as must be in ['teacher', 'student_on_exam', 'student_after_exam'] #}
+    {# show_for must be in ['teacher', 'student_on_exam', 'student_after_exam'] #}
     <h3>{{ test['question_txt'] }}</h3>
     {% if test['question_bytes'] %}
         <img class="ques-pic"
@@ -86,8 +86,8 @@
     {% else %}
         {% if show_for == 'student_on_exam' %}
             <label for="answer-plain-text">Введите ответ на вопрос.</label>
-            <input type="text" value="{{ test['correct'] }}"
-                   id="answer-plain-text" name="answer" class="input-group-addon q-inp">
+            <input type="text" id="answer-plain-text" name="answer"
+                   class="input-group-addon q-inp">
         {% else %}
             Правильный ответ: {{ test['correct'] }}<br/>
         {% endif %}
